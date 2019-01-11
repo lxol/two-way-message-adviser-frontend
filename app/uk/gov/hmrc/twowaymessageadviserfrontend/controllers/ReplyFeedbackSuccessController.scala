@@ -14,18 +14,21 @@
  * limitations under the License.
  */
 
-package config
+package controllers
 
-import javax.inject.{Inject, Singleton}
-
-import play.api.i18n.MessagesApi
-import play.api.mvc.Request
-import play.twirl.api.Html
-import uk.gov.hmrc.play.bootstrap.http.FrontendErrorHandler
+import javax.inject.Inject
+import play.api.i18n.{I18nSupport, MessagesApi}
+import uk.gov.hmrc.play.bootstrap.controller.FrontendController
+import config.FrontendAppConfig
+import play.api.mvc.Action
+// import views.html.replyFeedbackSuccess
 import uk.gov.hmrc.twowaymessageadviserfrontend.views
 
-@Singleton
-class ErrorHandler @Inject()(val messagesApi: MessagesApi, implicit val appConfig: FrontendAppConfig) extends FrontendErrorHandler {
-  override def standardErrorTemplate(pageTitle: String, heading: String, message: String)(implicit request: Request[_]): Html =
-    views.html.error_template(pageTitle, heading, message)
+class ReplyFeedbackSuccessController @Inject()(appConfig: FrontendAppConfig,
+                                         override val messagesApi: MessagesApi) extends FrontendController with I18nSupport {
+
+  def onPageLoad = Action {
+    implicit request =>
+      Ok(views.html.replyFeedbackSuccess(appConfig))
+  }
 }

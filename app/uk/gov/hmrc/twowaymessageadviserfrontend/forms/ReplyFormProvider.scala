@@ -14,18 +14,25 @@
  * limitations under the License.
  */
 
-package config
+package forms
 
-import javax.inject.{Inject, Singleton}
+import javax.inject.Inject
 
-import play.api.i18n.MessagesApi
-import play.api.mvc.Request
-import play.twirl.api.Html
-import uk.gov.hmrc.play.bootstrap.http.FrontendErrorHandler
-import uk.gov.hmrc.twowaymessageadviserfrontend.views
+import forms.mappings.Mappings
+import play.api.data.{Form, Mapping}
+import play.api.data.Forms._
+import models.ReplyDetails
+import utils.InputOption
 
-@Singleton
-class ErrorHandler @Inject()(val messagesApi: MessagesApi, implicit val appConfig: FrontendAppConfig) extends FrontendErrorHandler {
-  override def standardErrorTemplate(pageTitle: String, heading: String, message: String)(implicit request: Request[_]): Html =
-    views.html.error_template(pageTitle, heading, message)
+class ReplyFormProvider @Inject() extends FormErrorHelper with Mappings {
+
+  def apply(queueOptions: Seq[InputOption]): Form[ReplyDetails] =
+    Form(
+      mapping(
+        "queue" -> text(),
+        "subject" -> text(),
+        "content" -> text()
+      )(ReplyDetails.apply)(ReplyDetails.unapply)
+    )
+
 }

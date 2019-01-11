@@ -14,18 +14,17 @@
  * limitations under the License.
  */
 
-package config
+package utils
 
-import javax.inject.{Inject, Singleton}
+import play.api.data.Form
 
-import play.api.i18n.MessagesApi
-import play.api.mvc.Request
-import play.twirl.api.Html
-import uk.gov.hmrc.play.bootstrap.http.FrontendErrorHandler
-import uk.gov.hmrc.twowaymessageadviserfrontend.views
+object FormHelpers {
 
-@Singleton
-class ErrorHandler @Inject()(val messagesApi: MessagesApi, implicit val appConfig: FrontendAppConfig) extends FrontendErrorHandler {
-  override def standardErrorTemplate(pageTitle: String, heading: String, message: String)(implicit request: Request[_]): Html =
-    views.html.error_template(pageTitle, heading, message)
+  
+  def getErrorByKey[A](form: Form[_], errorKey: String) = {
+    form.error(errorKey) match {
+      case None => ""
+      case Some(error) => error.message
+    }
+  }
 }

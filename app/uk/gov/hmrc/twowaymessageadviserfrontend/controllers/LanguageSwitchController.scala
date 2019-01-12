@@ -23,7 +23,6 @@ import play.api.mvc.{Action, AnyContent, Call, Controller}
 import config.FrontendAppConfig
 import uk.gov.hmrc.play.language.LanguageUtils
 
-// TODO, upstream this into play-language
 class LanguageSwitchController @Inject() (
                                            configuration: Configuration,
                                            appConfig: FrontendAppConfig,

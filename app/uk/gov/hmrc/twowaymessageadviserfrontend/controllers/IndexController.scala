@@ -22,7 +22,6 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent}
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import config.FrontendAppConfig
-// import views.html.index
 import uk.gov.hmrc.twowaymessageadviserfrontend.views
 
 class IndexController @Inject()(val appConfig: FrontendAppConfig,

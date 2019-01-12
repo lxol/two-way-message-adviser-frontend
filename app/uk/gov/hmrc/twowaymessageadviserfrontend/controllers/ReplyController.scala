@@ -26,10 +26,7 @@ import config.FrontendAppConfig
 import forms.ReplyFormProvider
 
 import reactivemongo.bson.BSONObjectID
-//import utils.{Navigator, UserAnswers}
-// import views.html.reply
 import uk.gov.hmrc.twowaymessageadviserfrontend.views
-// import views.reply
 
 import play.api.mvc.{Action, AnyContent}
 
@@ -52,15 +49,7 @@ class ReplyController @Inject()(appConfig: FrontendAppConfig,
   def onPageLoad(id: BSONObjectID) = //(identify andThen getData andThen requireData)
     Action {
       implicit request =>
-      // val preparedForm = request.userAnswers.takingOverBusiness match {
-      //   case None => form
-      //   case Some(value) => form.fill(value)
-      // }
 
-
-
-
-      // val preparedForm = form.fill(options)
       Ok(views.html.reply(appConfig, form, options, id))
     }
 
@@ -74,25 +63,9 @@ class ReplyController @Inject()(appConfig: FrontendAppConfig,
         (replyDetails) => {
 
           Logger.debug(s"replyDetails: ${replyDetails}")
-          // val dataToAudit = ExitSurvey.asMap(surveyData)
-          // val event = new ExitSurveyAuditEvent(dataToAudit)
 
           Future.successful(Redirect(routes.ReplyFeedbackSuccessController.onPageLoad(id)))
         }
       )
   }
-  // def onSubmit() = //(identify andThen getData andThen requireData).async
-  //   Action {
-  //     implicit request =>
-  //     // form.bindFromRequest().fold(
-  //     //   (formWithErrors: Form[_]) =>
-  //     //     Future.successful(BadRequest(takingOverBusiness(appConfig, formWithErrors, NormalMode))),
-  //     //   (value) =>
-  //     //     dataCacheConnector.save[Boolean](request.internalId, TakingO
-
-  //     //verBusinessId.toString, value).map(cacheMap =>
-  //     //       Redirect(navigator.nextPage(TakingOverBusinessId, NormalMode)(new UserAnswers(cacheMap))))
-  //     // )
-  //     ???
-  //   }
 }

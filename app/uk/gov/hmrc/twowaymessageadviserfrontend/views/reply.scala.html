@@ -21,7 +21,9 @@
 
 @import utils.InputOption
 
-@(appConfig: FrontendAppConfig, form: Form[_], options: Seq[InputOption] )(implicit request: Request[_], messages: Messages)
+@import reactivemongo.bson.BSONObjectID
+
+@(appConfig: FrontendAppConfig, form: Form[_], options: Seq[InputOption], id: BSONObjectID )(implicit request: Request[_], messages: Messages)
 
 @main_template(
     title = messages("reply.title"),
@@ -34,7 +36,7 @@
 
     @components.heading("reply.heading")
 
-    @helpers.form(action = ReplyController.onSubmit(), 'autoComplete -> "off") {
+    @helpers.form(action = ReplyController.onSubmit(id), 'autoComplete -> "off") {
 
            @components.select(
                field = form("queue"),

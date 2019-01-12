@@ -1,4 +1,4 @@
-@*
+/*
  * Copyright 2019 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,19 +12,23 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *@
+ */
 
-@import config.FrontendAppConfig
-@import reactivemongo.bson.BSONObjectID
+package controllers
 
-@(appConfig: FrontendAppConfig, id: BSONObjectID)(implicit request: Request[_], messages: Messages)
+import javax.inject.Inject
 
-@main_template(
-    title = messages("feedbackSuccess.title"),
-    appConfig = appConfig,
-    bodyClasses = None) {
+import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.mvc.{Action, AnyContent}
+import uk.gov.hmrc.play.bootstrap.controller.FrontendController
+import config.FrontendAppConfig
+// import views.html.index
+import uk.gov.hmrc.twowaymessageadviserfrontend.views
 
-    @components.heading("reply.feedbackSuccess.heading")
+class IndexController @Inject()(val appConfig: FrontendAppConfig,
+                                val messagesApi: MessagesApi) extends FrontendController with I18nSupport {
 
-    <a id="start-again" href="@routes.ReplyController.onPageLoad(id)" class="button">@messages("site.startAgain")</a>
+  def onPageLoad: Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.index(appConfig))
+  }
 }

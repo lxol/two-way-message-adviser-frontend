@@ -61,10 +61,10 @@ class ReplyController @Inject()(appConfig: FrontendAppConfig,
 
 
       // val preparedForm = form.fill(options)
-      Ok(views.html.reply(appConfig, form, options))
+      Ok(views.html.reply(appConfig, form, options, id))
     }
 
-  def onSubmit() = Action.async {
+  def onSubmit(id: BSONObjectID) = Action.async {
     implicit request =>
 
       form.bindFromRequest().fold(
@@ -77,7 +77,7 @@ class ReplyController @Inject()(appConfig: FrontendAppConfig,
           // val dataToAudit = ExitSurvey.asMap(surveyData)
           // val event = new ExitSurveyAuditEvent(dataToAudit)
 
-          Future.successful(Redirect(routes.ReplyFeedbackSuccessController.onPageLoad()))
+          Future.successful(Redirect(routes.ReplyFeedbackSuccessController.onPageLoad(id)))
         }
       )
   }

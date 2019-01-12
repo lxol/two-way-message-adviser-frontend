@@ -15,16 +15,15 @@
  *@
 
 @import config.FrontendAppConfig
-@import reactivemongo.bson.BSONObjectID
 
-@(appConfig: FrontendAppConfig, id: BSONObjectID)(implicit request: Request[_], messages: Messages)
+@(appConfig: FrontendAppConfig)(implicit request: Request[_], messages: Messages)
 
 @main_template(
-    title = messages("feedbackSuccess.title"),
+    title = messages("index.title"),
     appConfig = appConfig,
     bodyClasses = None) {
 
-    @components.heading("reply.feedbackSuccess.heading")
+    @components.heading("index.heading")
 
-    <a id="start-again" href="@routes.ReplyController.onPageLoad(id)" class="button">@messages("site.startAgain")</a>
+    <p>@messages("index.guidance")</p>
 }

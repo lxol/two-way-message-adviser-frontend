@@ -1,9 +1,11 @@
 # microservice specific routes
 
+GET        /                            controllers.IndexController.onPageLoad
+
 GET        /hello-world                  controllers.HelloWorld.helloWorld
 
 GET        /message/:id/reply            controllers.ReplyController.onPageLoad(id: reactivemongo.bson.BSONObjectID)
-POST       /message/submit               controllers.ReplyController.onSubmit()
-GET        /message/submitted            controllers.ReplyFeedbackSuccessController.onPageLoad()
+POST       /message/submit               controllers.ReplyController.onSubmit(id: reactivemongo.bson.BSONObjectID)
+GET        /message/submitted            controllers.ReplyFeedbackSuccessController.onPageLoad(id: reactivemongo.bson.BSONObjectID )
 
 GET        /language/:lang               controllers.LanguageSwitchController.switchToLanguage(lang: String)

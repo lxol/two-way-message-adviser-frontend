@@ -22,13 +22,14 @@ import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import config.FrontendAppConfig
 import play.api.mvc.Action
 // import views.html.replyFeedbackSuccess
+import reactivemongo.bson.BSONObjectID
 import uk.gov.hmrc.twowaymessageadviserfrontend.views
 
 class ReplyFeedbackSuccessController @Inject()(appConfig: FrontendAppConfig,
                                          override val messagesApi: MessagesApi) extends FrontendController with I18nSupport {
 
-  def onPageLoad = Action {
+  def onPageLoad(id: BSONObjectID) = Action {
     implicit request =>
-      Ok(views.html.replyFeedbackSuccess(appConfig))
+      Ok(views.html.replyFeedbackSuccess(appConfig, id))
   }
 }

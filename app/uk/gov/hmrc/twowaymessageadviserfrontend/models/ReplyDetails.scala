@@ -14,23 +14,13 @@
  * limitations under the License.
  */
 
-package forms
+package models
 
-import forms.mappings.Mappings
-import javax.inject.Inject
-import models.ReplyDetails
-import play.api.data.Form
-import play.api.data.Forms._
-import utils.InputOption
+import play.api.libs.json._
+import reactivemongo.bson.BSONObjectID
 
-class ReplyFormProvider @Inject() extends FormErrorHelper with Mappings {
+case class ReplyDetails (reply: String)
 
-  def apply(): Form[ReplyDetails] =
-    Form(
-      mapping(
-        // "messageId" -> text(),
-        "content" -> text()
-      )(ReplyDetails.apply)(ReplyDetails.unapply)
-    )
-
+object ReplyDetails {
+  implicit val format = Json.format[ReplyDetails]
 }

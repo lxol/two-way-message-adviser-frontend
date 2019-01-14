@@ -16,13 +16,10 @@
 
 package uk.gov.hmrc.message.controllers.binders
 
-import play.api.Play
-import play.api.mvc.QueryStringBindable
+import play.api.mvc.{PathBindable, QueryStringBindable}
 import reactivemongo.bson.BSONObjectID
-import play.api.mvc.PathBindable
-import scala.util.{Failure, Success}
 
-import scala.util.Try
+import scala.util.{Failure, Success, Try}
 
 object Binders {
   implicit val BSONObjectIdBinder = new QueryStringBindable[BSONObjectID] {

@@ -1,0 +1,21 @@
+* Example project pension-annual-allowance-calculator-frontend
+#+begin_example
+  /home/lxol/Applications/hmrc-development-environment/hmrc-repos/pension-annual-allowance-calculator-frontend/app:
+  total used in directory 64K available 140521748
+  drwxr-xr-x 16 lxol lxol 4.0K Jul 14  2018 .
+  drwxr-xr-x  9 lxol lxol 4.0K Jul 14  2018 ..
+  drwxr-xr-x  4 lxol lxol 4.0K Jul 14  2018 assets
+  drwxr-xr-x  2 lxol lxol 4.0K Jul 14  2018 config
+  drwxr-xr-x  2 lxol lxol 4.0K Jul 14  2018 connectors
+  drwxr-xr-x  3 lxol lxol 4.0K Jul 14  2018 controllers
+  drwxr-xr-x  2 lxol lxol 4.0K Jul 14  2018 filters
+  drwxr-xr-x  3 lxol lxol 4.0K Jul 14  2018 forms
+  drwxr-xr-x  2 lxol lxol 4.0K Jul 14  2018 handlers
+  drwxr-xr-x  2 lxol lxol 4.0K Jul 14  2018 identifiers
+  drwxr-xr-x  4 lxol lxol 4.0K Jul 14  2018 models
+  drwxr-xr-x  2 lxol lxol 4.0K Jul 14  2018 repositories
+  drwxr-xr-x  2 lxol lxol 4.0K Jul 14  2018 services
+  drwxr-xr-x  2 lxol lxol 4.0K Jul 14  2018 utils
+  drwxr-xr-x  2 lxol lxol 4.0K Jul 14  2018 viewmodels
+  drwxr-xr-x  3 lxol lxol 4.0K Jul 14  2018 views
+#+end_example

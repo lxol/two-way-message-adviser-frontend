@@ -16,41 +16,31 @@
 
 package controllers
 
-import javax.inject.Inject
-
-import play.api.{Configuration, Logger}
-import play.api.data.Form
-import play.api.i18n.{I18nSupport, MessagesApi}
-import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import config.FrontendAppConfig
 import forms.ReplyFormProvider
-
+import javax.inject.Inject
+import models.ReplyDetails
+import play.api.Logger
+import play.api.data.Form
+import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.mvc.Action
 import reactivemongo.bson.BSONObjectID
+import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import uk.gov.hmrc.twowaymessageadviserfrontend.views
 
-import play.api.mvc.{Action, AnyContent}
-
 import scala.concurrent.Future
-import utils.InputOption
-
-import models.ReplyDetails
 
 class ReplyController @Inject()(appConfig: FrontendAppConfig,
   override val messagesApi: MessagesApi,
   formProvider: ReplyFormProvider) extends FrontendController with I18nSupport {
 
-      def options: Seq[InputOption] = Seq(
-        InputOption("queue1", "reply.dropdown.p1", Some("vat_vat-form")),
-        InputOption("queue2", "reply.dropdown.p2", None),
-        InputOption("queue99", "reply.dropdown.p3", None)
-      )
-  val form: Form[ReplyDetails] = formProvider(options)
+  val form: Form[ReplyDetails] = formProvider()
 
-  def onPageLoad(id: BSONObjectID) = //(identify andThen getData andThen requireData)
+  def onPageLoad(id: BSONObjectID) =
     Action {
       implicit request =>
 
-      Ok(views.html.reply(appConfig, form, options, id))
+      Ok(views.html.reply(appConfig, form, id))
     }
 
   def onSubmit(id: BSONObjectID) = Action.async {

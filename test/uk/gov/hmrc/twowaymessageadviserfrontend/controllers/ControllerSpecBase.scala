@@ -14,12 +14,15 @@
  * limitations under the License.
  */
 
-package models
+package controllers
 
-import play.api.libs.json._
+import base.SpecBase
 
-case class ReplyDetails (queue: String, subject: String, text: String)
+trait ControllerSpecBase extends SpecBase {
 
-object ReplyDetails {
-  implicit val format = Json.format[ReplyDetails]
+
+
+  // def getEmptyCacheMap = new FakeDataRetrievalAction(Some(emptyCacheMap))
+
+  // def dontGetAnyData = new FakeDataRetrievalAction(None)
 }

@@ -14,23 +14,18 @@
  * limitations under the License.
  */
 
-package forms
+package controllers
 
-import forms.mappings.Mappings
-import javax.inject.Inject
-import models.ReplyDetails
-import play.api.data.Form
-import play.api.data.Forms._
-import utils.InputOption
+import base.SpecBase
 
-class ReplyFormProvider @Inject() extends FormErrorHelper with Mappings {
+trait ReplyControllerSpec extends SpecBase {
 
-  def apply(): Form[ReplyDetails] =
-    Form(
-      mapping(
-        // "messageId" -> text(),
-        "content" -> text()
-      )(ReplyDetails.apply)(ReplyDetails.unapply)
-    )
 
+  val controller = new SecureMessageController(app.injector.instanceOf(classOf[CustomerAdviceAudit]), app.injector.instanceOf(classOf[SecureMessageService]), app.injector.instanceOf(classOf[MessagesApi]))(app.injector.instanceOf(classOf[FrontendAppConfig])) {
+    def auditSource: String = "customer-advisors-frontend"
+  }
+
+  // def getEmptyCacheMap = new FakeDataRetrievalAction(Some(emptyCacheMap))
+
+  // def dontGetAnyData = new FakeDataRetrievalAction(None)
 }

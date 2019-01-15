@@ -14,22 +14,16 @@
  * limitations under the License.
  */
 
-package controllers
+package utils
 
-import config.FrontendAppConfig
-import javax.inject.{Inject, Singleton}
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc._
-import uk.gov.hmrc.play.bootstrap.controller.FrontendController
-import uk.gov.hmrc.twowaymessageadviserfrontend.views
+import play.api.data.Form
 
-import scala.concurrent.Future
+object FormHelpers {
 
-@Singleton
-class HelloWorld @Inject()(val messagesApi: MessagesApi, implicit val appConfig: FrontendAppConfig) extends FrontendController with I18nSupport {
-
-  val helloWorld = Action.async { implicit request =>
-    Future.successful(Ok(views.html.hello_world()))
+  def getErrorByKey[A](form: Form[_], errorKey: String) = {
+    form.error(errorKey) match {
+      case None => ""
+      case Some(error) => error.message
+    }
   }
-
 }

@@ -1,4 +1,4 @@
-/*
+@*
  * Copyright 2019 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,24 +12,21 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ *@
 
-package controllers
+@(errors: Seq[FormError])(implicit messages: Messages)
+@if(errors.nonEmpty) {
+    <div class="error-summary error-summary--show" role="group" aria-labelledby="error-summary-heading" tabindex="-1">
 
-import config.FrontendAppConfig
-import javax.inject.{Inject, Singleton}
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc._
-import uk.gov.hmrc.play.bootstrap.controller.FrontendController
-import uk.gov.hmrc.twowaymessageadviserfrontend.views
+        <h2 class="heading-medium error-summary-heading" id="error-summary-heading">
+        @messages("error.summary.title")
+        </h2>
 
-import scala.concurrent.Future
+        <ul role="list" class="error-summary-list">
+            @for(error <- errors) {
+                <li><a href="#@{error.key}">@messages(error.message, error.args:_*)</a></li>
+            }
+        </ul>
 
-@Singleton
-class HelloWorld @Inject()(val messagesApi: MessagesApi, implicit val appConfig: FrontendAppConfig) extends FrontendController with I18nSupport {
-
-  val helloWorld = Action.async { implicit request =>
-    Future.successful(Ok(views.html.hello_world()))
-  }
-
+    </div>
 }

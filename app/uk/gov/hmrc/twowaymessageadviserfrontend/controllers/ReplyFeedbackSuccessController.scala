@@ -17,19 +17,18 @@
 package controllers
 
 import config.FrontendAppConfig
-import javax.inject.{Inject, Singleton}
+import javax.inject.Inject
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc._
+import play.api.mvc.Action
+import reactivemongo.bson.BSONObjectID
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import uk.gov.hmrc.twowaymessageadviserfrontend.views
 
-import scala.concurrent.Future
+class ReplyFeedbackSuccessController @Inject()(appConfig: FrontendAppConfig,
+                                         override val messagesApi: MessagesApi) extends FrontendController with I18nSupport {
 
-@Singleton
-class HelloWorld @Inject()(val messagesApi: MessagesApi, implicit val appConfig: FrontendAppConfig) extends FrontendController with I18nSupport {
-
-  val helloWorld = Action.async { implicit request =>
-    Future.successful(Ok(views.html.hello_world()))
+  def onPageLoad(id: BSONObjectID) = Action {
+    implicit request =>
+      Ok(views.html.replyFeedbackSuccess(appConfig, id))
   }
-
 }

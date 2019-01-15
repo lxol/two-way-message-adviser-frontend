@@ -14,22 +14,28 @@
  * limitations under the License.
  */
 
-package controllers
+package base
 
 import config.FrontendAppConfig
-import javax.inject.{Inject, Singleton}
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc._
-import uk.gov.hmrc.play.bootstrap.controller.FrontendController
-import uk.gov.hmrc.twowaymessageadviserfrontend.views
+import org.scalatestplus.play.PlaySpec
+import org.scalatestplus.play.guice._
+import play.api.i18n.{Messages, MessagesApi}
+import play.api.inject.Injector
+import play.api.test.FakeRequest
 
-import scala.concurrent.Future
+trait SpecBase extends PlaySpec with GuiceOneAppPerSuite {
 
-@Singleton
-class HelloWorld @Inject()(val messagesApi: MessagesApi, implicit val appConfig: FrontendAppConfig) extends FrontendController with I18nSupport {
+  def injector: Injector = app.injector
 
-  val helloWorld = Action.async { implicit request =>
-    Future.successful(Ok(views.html.hello_world()))
-  }
+  def frontendAppConfig: FrontendAppConfig = injector.instanceOf[FrontendAppConfig]
 
+  def messagesApi: MessagesApi = injector.instanceOf[MessagesApi]
+
+  def fakeRequest = FakeRequest("", "")
+
+  def getRequest = FakeRequest("GET", "/")
+
+  def postRequest = FakeRequest("POST", "/")
+
+  def messages: Messages = messagesApi.preferred(fakeRequest)
 }

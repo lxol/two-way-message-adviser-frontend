@@ -14,9 +14,9 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.twowaymessageadviserfrontend.config.AppConfig
-@()(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
+@import config.FrontendAppConfig
+@()(implicit request: Request[_], messages: Messages, appConfig: FrontendAppConfig)
 
-@main_template(title = "Hello from two-way-message-adviser-frontend", bodyClasses = None) {
+@main_template(title = "Hello from two-way-message-adviser-frontend", appConfig = appConfig, bodyClasses = None) {
     <h1>Hello from two-way-message-adviser-frontend !</h1>
 }

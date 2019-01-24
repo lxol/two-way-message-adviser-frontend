@@ -18,15 +18,29 @@ package controllers
 
 import config.FrontendAppConfig
 import javax.inject.Inject
+import play.api.{Configuration, Environment}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent}
+import uk.gov.hmrc.auth.core.AuthProvider.PrivilegedApplication
+import uk.gov.hmrc.auth.core.{AuthConnector, AuthProviders, AuthorisedFunctions, NoActiveSession}
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import uk.gov.hmrc.twowaymessageadviserfrontend.views
+import uk.gov.hmrc.twowaymessageadviserfrontend.controllers.util.StrideUtil
+
+import scala.concurrent.Future
 
 class IndexController @Inject()(val appConfig: FrontendAppConfig,
-                                val messagesApi: MessagesApi) extends FrontendController with I18nSupport {
+                                val messagesApi: MessagesApi,
+                                val config: Configuration,
+                                val env: Environment,
+                                val authConnector: AuthConnector,
+                                val strideUtil: StrideUtil) extends FrontendController with I18nSupport with AuthorisedFunctions {
 
-  def onPageLoad: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.index(appConfig))
+  def onPageLoad: Action[AnyContent] = Action.async { implicit request =>
+    authorised(AuthProviders(PrivilegedApplication)) {
+      Future.successful(Ok(views.html.index(appConfig)))
+    }.recoverWith {
+      case _: NoActiveSession => strideUtil.redirectToStrideLogin()
+    }
   }
 }

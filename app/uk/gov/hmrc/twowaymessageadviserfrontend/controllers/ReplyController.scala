@@ -19,33 +19,44 @@ package controllers
 import config.FrontendAppConfig
 import forms.ReplyFormProvider
 import javax.inject.Inject
+
 import models.ReplyDetails
-import play.api.Logger
+import play.api.{Configuration, Environment, Logger}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.Action
 import reactivemongo.bson.BSONObjectID
+import uk.gov.hmrc.auth.core.AuthProvider.PrivilegedApplication
+import uk.gov.hmrc.auth.core.{AuthConnector, AuthProviders, AuthorisedFunctions, NoActiveSession}
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
+import uk.gov.hmrc.twowaymessageadviserfrontend.controllers.util.StrideUtil
 import uk.gov.hmrc.twowaymessageadviserfrontend.views
 
 import scala.concurrent.Future
 
 class ReplyController @Inject()(appConfig: FrontendAppConfig,
   override val messagesApi: MessagesApi,
-  formProvider: ReplyFormProvider) extends FrontendController with I18nSupport {
+  formProvider: ReplyFormProvider,
+  val config: Configuration,
+  val env: Environment,
+  val authConnector: AuthConnector,
+  val strideUtil: StrideUtil) extends FrontendController with I18nSupport with AuthorisedFunctions {
 
   val form: Form[ReplyDetails] = formProvider()
 
-  def onPageLoad(id: BSONObjectID) =
-    Action {
+  def onPageLoad(id: BSONObjectID) = Action.async {
       implicit request =>
-
-      Ok(views.html.reply(appConfig, form, id))
+      authorised(AuthProviders(PrivilegedApplication)) {
+        Future.successful(Ok(views.html.reply(appConfig, form, id)))
+      }.recoverWith {
+        case _: NoActiveSession => strideUtil.redirectToStrideLogin()
+      }
     }
 
   def onSubmit(id: BSONObjectID) = Action.async {
     implicit request =>
 
+      authorised(AuthProviders(PrivilegedApplication)) {
       form.bindFromRequest().fold(
         (formWithErrors: Form[_]) =>
           Future.successful(BadRequest("")),
@@ -57,5 +68,8 @@ class ReplyController @Inject()(appConfig: FrontendAppConfig,
           Future.successful(Redirect(routes.ReplyFeedbackSuccessController.onPageLoad(id)))
         }
       )
+      }.recoverWith {
+        case _: NoActiveSession => strideUtil.redirectToStrideLogin()
+      }
   }
 }

@@ -29,6 +29,7 @@ import reactivemongo.bson.BSONObjectID
 import uk.gov.hmrc.auth.core.AuthProvider.PrivilegedApplication
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthProviders, AuthorisedFunctions, NoActiveSession}
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
+import uk.gov.hmrc.twowaymessageadviserfrontend.connectors.TwoWayMessageConnector
 import uk.gov.hmrc.twowaymessageadviserfrontend.controllers.util.StrideUtil
 import uk.gov.hmrc.twowaymessageadviserfrontend.views
 
@@ -40,7 +41,8 @@ class ReplyController @Inject()(appConfig: FrontendAppConfig,
   val config: Configuration,
   val env: Environment,
   val authConnector: AuthConnector,
-  val strideUtil: StrideUtil) extends FrontendController with I18nSupport with AuthorisedFunctions {
+  val strideUtil: StrideUtil,
+  val twoWayMessageConnector: TwoWayMessageConnector) extends FrontendController with I18nSupport with AuthorisedFunctions {
 
   val form: Form[ReplyDetails] = formProvider()
 
@@ -64,8 +66,10 @@ class ReplyController @Inject()(appConfig: FrontendAppConfig,
         (replyDetails) => {
 
           Logger.debug(s"replyDetails: ${replyDetails}")
+          twoWayMessageConnector.postMessage(replyDetails, id.stringify).map {
+            case _  => Redirect(routes.ReplyFeedbackSuccessController.onPageLoad(id))
+          }
 
-          Future.successful(Redirect(routes.ReplyFeedbackSuccessController.onPageLoad(id)))
         }
       )
       }.recoverWith {

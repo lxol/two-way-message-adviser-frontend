@@ -27,7 +27,7 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.Action
 import reactivemongo.bson.BSONObjectID
 import uk.gov.hmrc.auth.core.AuthProvider.PrivilegedApplication
-import uk.gov.hmrc.auth.core.{AuthConnector, AuthProviders, AuthorisedFunctions, NoActiveSession}
+import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import uk.gov.hmrc.twowaymessageadviserfrontend.connectors.TwoWayMessageConnector
 import uk.gov.hmrc.twowaymessageadviserfrontend.controllers.util.StrideUtil
@@ -52,6 +52,7 @@ class ReplyController @Inject()(appConfig: FrontendAppConfig,
         Future.successful(Ok(views.html.reply(appConfig, form, id)))
       }.recoverWith {
         case _: NoActiveSession => strideUtil.redirectToStrideLogin()
+        case _: UnsupportedAuthProvider => strideUtil.redirectToStrideLogin()
       }
     }
 

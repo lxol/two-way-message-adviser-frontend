@@ -18,11 +18,12 @@ package controllers
 
 import config.FrontendAppConfig
 import javax.inject.Inject
+
 import play.api.{Configuration, Environment}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent}
 import uk.gov.hmrc.auth.core.AuthProvider.PrivilegedApplication
-import uk.gov.hmrc.auth.core.{AuthConnector, AuthProviders, AuthorisedFunctions, NoActiveSession}
+import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import uk.gov.hmrc.twowaymessageadviserfrontend.views
 import uk.gov.hmrc.twowaymessageadviserfrontend.controllers.util.StrideUtil
@@ -41,6 +42,7 @@ class IndexController @Inject()(val appConfig: FrontendAppConfig,
       Future.successful(Ok(views.html.index(appConfig)))
     }.recoverWith {
       case _: NoActiveSession => strideUtil.redirectToStrideLogin()
+      case _: UnsupportedAuthProvider => strideUtil.redirectToStrideLogin()
     }
   }
 }

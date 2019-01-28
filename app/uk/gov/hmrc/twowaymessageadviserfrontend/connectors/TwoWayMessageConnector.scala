@@ -19,6 +19,7 @@ package uk.gov.hmrc.twowaymessageadviserfrontend.connectors
 import javax.inject.Inject
 
 import models.ReplyDetails
+import org.apache.commons.codec.binary.Base64
 import play.api.{Configuration, Environment}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
@@ -36,7 +37,8 @@ class TwoWayMessageConnector @Inject()(httpClient: HttpClient,
   lazy val twoWayMessageBaseUrl: String = baseUrl("two-way-message")
 
   def postMessage(reply: ReplyDetails, replyTo: String)(implicit hc: HeaderCarrier): Future[HttpResponse] = {
-    httpClient.POST(s"$twoWayMessageBaseUrl/two-way-message/message/advisor/${replyTo}/reply", reply)
+    val encodedReply = reply.copy(content = Base64.encodeBase64String(reply.content.getBytes("UTF-8")))
+    httpClient.POST(s"$twoWayMessageBaseUrl/two-way-message/message/advisor/${replyTo}/reply", encodedReply)
   }
 }
 

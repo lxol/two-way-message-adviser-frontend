@@ -34,7 +34,7 @@
 
     @components.error_summary(form.errors)
 
-    @components.heading("reply.heading")
+    @components.heading(messages("reply.heading"))
 
     @helpers.form(action = ReplyController.onSubmit(id), 'autoComplete -> "off") {
 

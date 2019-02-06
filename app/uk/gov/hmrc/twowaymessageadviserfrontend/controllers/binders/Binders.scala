@@ -19,9 +19,10 @@ package uk.gov.hmrc.message.controllers.binders
 import play.api.mvc.{PathBindable, QueryStringBindable}
 import reactivemongo.bson.BSONObjectID
 
-import scala.util.{Failure, Success, Try}
+import scala.util.{Failure, Success}
 
 object Binders {
+
   implicit val BSONObjectIdBinder = new QueryStringBindable[BSONObjectID] {
     def bind(key: String, params: Map[String, Seq[String]]): Option[Either[String, BSONObjectID]] =
       params.get(key).flatMap(_.headOption).map(value => BSONObjectID.parse(value) match {
@@ -32,7 +33,7 @@ object Binders {
     def unbind(key: String, value: BSONObjectID): String = QueryStringBindable.bindableString.unbind(key, value.stringify)
   }
 
-  implicit def bsonIdBinder(implicit stringBinder: PathBindable[String]) = new PathBindable[BSONObjectID] {
+  implicit def bsonIdBinder(implicit stringBinder: PathBindable[String]): PathBindable[BSONObjectID] = new PathBindable[BSONObjectID] {
     def bind(key: String, value: String): Either[String, BSONObjectID] = stringBinder.bind(key,value) match {
       case Left(msg) => Left(msg)
       case Right(id) => BSONObjectID.parse(id) match {

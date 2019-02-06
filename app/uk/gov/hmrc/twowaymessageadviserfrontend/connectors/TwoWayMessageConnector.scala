@@ -41,4 +41,3 @@ class TwoWayMessageConnector @Inject()(httpClient: HttpClient,
     httpClient.POST(s"$twoWayMessageBaseUrl/two-way-message/message/advisor/${replyTo}/reply", encodedReply)
   }
 }
-

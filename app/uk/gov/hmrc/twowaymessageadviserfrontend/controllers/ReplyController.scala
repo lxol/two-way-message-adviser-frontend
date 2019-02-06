@@ -19,12 +19,11 @@ package controllers
 import config.FrontendAppConfig
 import forms.ReplyFormProvider
 import javax.inject.Inject
-
 import models.ReplyDetails
-import play.api.{Configuration, Environment, Logger}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.Action
+import play.api.mvc.{Action, AnyContent}
+import play.api.{Configuration, Environment, Logger}
 import reactivemongo.bson.BSONObjectID
 import uk.gov.hmrc.auth.core.AuthProvider.PrivilegedApplication
 import uk.gov.hmrc.auth.core._
@@ -46,7 +45,7 @@ class ReplyController @Inject()(appConfig: FrontendAppConfig,
 
   val form: Form[ReplyDetails] = formProvider()
 
-  def onPageLoad(id: BSONObjectID) = Action.async {
+  def onPageLoad(id: BSONObjectID): Action[AnyContent] = Action.async {
       implicit request =>
       authorised(AuthProviders(PrivilegedApplication)) {
         Future.successful(Ok(views.html.reply(appConfig, form, id)))
@@ -56,13 +55,13 @@ class ReplyController @Inject()(appConfig: FrontendAppConfig,
       }
     }
 
-  def onSubmit(id: BSONObjectID) = Action.async {
+  def onSubmit(id: BSONObjectID): Action[AnyContent] = Action.async {
     implicit request =>
 
       authorised(AuthProviders(PrivilegedApplication)) {
       form.bindFromRequest().fold(
         (formWithErrors: Form[_]) =>
-          Future.successful(BadRequest("")),
+          Future.successful(Ok(views.html.reply(appConfig, formWithErrors, id))),
 
         (replyDetails) => {
 
@@ -70,7 +69,6 @@ class ReplyController @Inject()(appConfig: FrontendAppConfig,
           twoWayMessageConnector.postMessage(replyDetails, id.stringify).map {
             case _  => Redirect(routes.ReplyFeedbackSuccessController.onPageLoad(id))
           }
-
         }
       )
       }.recoverWith {

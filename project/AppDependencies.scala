@@ -13,7 +13,6 @@ object AppDependencies {
     "uk.gov.hmrc"             %% "bootstrap-play-25"        % "3.7.0",
     "uk.gov.hmrc"             %% "play-reactivemongo"       % "6.2.0",
     "uk.gov.hmrc"             %% "play-language"            % "3.4.0"
-
   )
 
   val test = Seq(
@@ -23,7 +22,11 @@ object AppDependencies {
     "org.pegdown"             %  "pegdown"                  % "1.6.0"                 % "test, it",
     "uk.gov.hmrc"             %% "service-integration-test" % "0.2.0"                 % "test, it",
     "uk.gov.hmrc"             %% "reactivemongo-test"       % "3.0.0"                 % "test,it",
-    "org.scalatestplus.play"  %% "scalatestplus-play"       % "2.0.0"                 % "test, it"
+    "org.scalatestplus.play"  %% "scalatestplus-play"       % "2.0.1"                 % "test, it",
+    "org.asynchttpclient" % "async-http-client" % "2.0.39"   % "test, it",
+    "io.netty" % "netty-buffer" % "4.0.56.Final"   % "test, it",
+    "io.netty" % "netty-codec-http" % "4.0.56.Final"   % "test, it",
+    "io.netty" % "netty-transport-native-epoll" % "4.0.56.Final"   % "test, it"
   )
 
 }

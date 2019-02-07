@@ -20,7 +20,7 @@ import javax.inject.Inject
 
 import play.api.mvc.AnyContent
 import play.api.mvc.Request
-import play.api.{Configuration, Environment, Mode}
+import play.api.{Configuration, Environment}
 import uk.gov.hmrc.play.bootstrap.config.AuthRedirects
 
 import scala.concurrent.Future
@@ -28,9 +28,11 @@ import scala.concurrent.Future
 class StrideUtil @Inject()(val env: Environment, val config: Configuration) extends AuthRedirects{
 
   def redirectToStrideLogin()(implicit request: Request[AnyContent]) = {
-    val strideUrl = if (env.mode == Mode.Dev) s"http://${request.host}${request.uri}" else s"${request.uri}"
-    Future.successful(
-      toStrideLogin(strideUrl)
-    )
+
+    config.getBoolean("includeHostInRedirect") match {
+      case Some(true) => Future.successful(toStrideLogin( s"http://${request.host}${request.uri}"))
+      case _ => Future.successful(toStrideLogin(request.uri))
+    }
+
   }
 }

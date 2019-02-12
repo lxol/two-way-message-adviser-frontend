@@ -18,7 +18,6 @@ package controllers
 
 import config.FrontendAppConfig
 import javax.inject.Inject
-
 import play.api.{Configuration, Environment}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent}
@@ -28,14 +27,14 @@ import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import uk.gov.hmrc.twowaymessageadviserfrontend.views
 import uk.gov.hmrc.twowaymessageadviserfrontend.controllers.util.StrideUtil
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class IndexController @Inject()(val appConfig: FrontendAppConfig,
                                 val messagesApi: MessagesApi,
                                 val config: Configuration,
                                 val env: Environment,
                                 val authConnector: AuthConnector,
-                                val strideUtil: StrideUtil) extends FrontendController with I18nSupport with AuthorisedFunctions {
+                                val strideUtil: StrideUtil)(implicit ec:ExecutionContext) extends FrontendController with I18nSupport with AuthorisedFunctions {
 
   def onPageLoad: Action[AnyContent] = Action.async { implicit request =>
     authorised(AuthProviders(PrivilegedApplication)) {

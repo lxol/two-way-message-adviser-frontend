@@ -32,7 +32,7 @@ import uk.gov.hmrc.twowaymessageadviserfrontend.connectors.TwoWayMessageConnecto
 import uk.gov.hmrc.twowaymessageadviserfrontend.controllers.util.StrideUtil
 import uk.gov.hmrc.twowaymessageadviserfrontend.views
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class ReplyController @Inject()(appConfig: FrontendAppConfig,
   override val messagesApi: MessagesApi,
@@ -41,7 +41,7 @@ class ReplyController @Inject()(appConfig: FrontendAppConfig,
   val env: Environment,
   val authConnector: AuthConnector,
   val strideUtil: StrideUtil,
-  val twoWayMessageConnector: TwoWayMessageConnector) extends FrontendController with I18nSupport with AuthorisedFunctions {
+  val twoWayMessageConnector: TwoWayMessageConnector)(implicit ec:ExecutionContext) extends FrontendController with I18nSupport with AuthorisedFunctions {
 
   val form: Form[ReplyDetails] = formProvider()
 

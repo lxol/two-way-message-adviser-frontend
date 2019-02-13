@@ -21,7 +21,6 @@ object AppDependencies {
     "com.typesafe.play"       %% "play-test"                % current                 % "test",
     "org.pegdown"             %  "pegdown"                  % "1.6.0"                 % "test, it",
     "uk.gov.hmrc"             %% "service-integration-test" % "0.2.0"                 % "test, it",
-    "uk.gov.hmrc"             %% "reactivemongo-test"       % "3.0.0"                 % "test,it",
     "org.scalatestplus.play"  %% "scalatestplus-play"       % "2.0.1"                 % "test, it",
     "org.asynchttpclient" % "async-http-client" % "2.0.39"   % "test, it",
     "io.netty" % "netty-buffer" % "4.0.56.Final"   % "test, it",

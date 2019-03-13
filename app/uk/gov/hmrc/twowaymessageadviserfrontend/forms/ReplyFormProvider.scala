@@ -27,7 +27,7 @@ class ReplyFormProvider @Inject() extends FormErrorHelper with Mappings {
   def apply(): Form[ReplyDetails] =
     Form(
       mapping(
-        "content" -> nonEmptyText
+        "content" -> nonEmptyText(minLength = 100)
       )(ReplyDetails.apply)(ReplyDetails.unapply)
     )
 

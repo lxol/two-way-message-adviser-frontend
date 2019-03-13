@@ -19,6 +19,7 @@ package controllers
 import config.FrontendAppConfig
 import forms.ReplyFormProvider
 import javax.inject.Inject
+
 import models.ReplyDetails
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -48,7 +49,9 @@ class ReplyController @Inject()(appConfig: FrontendAppConfig,
   def onPageLoad(id: BSONObjectID): Action[AnyContent] = Action.async {
       implicit request =>
       authorised(AuthProviders(PrivilegedApplication)) {
-        Future.successful(Ok(views.html.reply(appConfig, form, id)))
+        twoWayMessageConnector.retrieveRecipientIdentifier(id.stringify).map {
+          identifier => Ok(views.html.reply(appConfig, form, id, identifier, Option.empty))
+        }
       }.recoverWith {
         case _: NoActiveSession => strideUtil.redirectToStrideLogin()
         case _: UnsupportedAuthProvider => strideUtil.redirectToStrideLogin()
@@ -61,7 +64,7 @@ class ReplyController @Inject()(appConfig: FrontendAppConfig,
       authorised(AuthProviders(PrivilegedApplication)) {
       form.bindFromRequest().fold(
         (formWithErrors: Form[_]) =>
-          Future.successful(Ok(views.html.reply(appConfig, formWithErrors, id))),
+            Future.successful(Ok(views.html.reply(appConfig, formWithErrors, id, formWithErrors.data.get("identifier").get, formWithErrors.data.get("content")))),
 
         (replyDetails) => {
 

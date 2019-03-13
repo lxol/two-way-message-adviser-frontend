@@ -24,6 +24,11 @@
     appConfig = appConfig,
     bodyClasses = None) {
 
-    @components.heading("reply.feedbackSuccess.heading")
+<div class="transaction-banner--complete">
+    <div class="transaction-banner__heading">@components.heading("reply.feedbackSuccess.heading", "heading-xlarge")</div>
+</div>
+<p>@messages("reply.feedbackSuccess.p1")</p>
+<p>@messages("reply.feedbackSuccess.p2")</p>
+
 
 }

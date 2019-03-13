@@ -25,13 +25,14 @@ site.startAgain = Reply to next message
 site.service_name = Two way message adviser frontend
 site.textarea.char_limit = (Limit is {0} characters)
 
-reply.title = Reply to a secure question
 reply.heading = Reply to a secure question
 reply.whatis = Type of the question
 reply.dropdown.p1 = Help with Self Assessment
 reply.dropdown.p2 = Help with Child Care
 reply.dropdown.p3 = Other Query
-reply.feedbackSuccess.heading = Thank you for the reply!
+reply.feedbackSuccess.heading = Message Sent
+reply.feedbackSuccess.p1 = We have added your reply to the message in the customer's personal tax account.
+reply.feedbackSuccess.p2 = We're also sending an email to the customer to tell them a reply is waiting to be read.
 
 reply.content = Reply
 

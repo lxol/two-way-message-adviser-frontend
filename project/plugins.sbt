@@ -25,3 +25,5 @@ addSbtPlugin("com.typesafe.sbt" % "sbt-uglify" % "1.0.4")
 addSbtPlugin("com.typesafe.sbt" % "sbt-digest" % "1.1.2")
 addSbtPlugin("net.virtual-void" % "sbt-dependency-graph" % "0.9.2")
 
+addSbtPlugin("org.scoverage" % "sbt-scoverage" % "1.5.0")
+

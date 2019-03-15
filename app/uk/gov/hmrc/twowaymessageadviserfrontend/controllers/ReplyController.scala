@@ -60,14 +60,16 @@ class ReplyController @Inject()(appConfig: FrontendAppConfig,
 
   def onSubmit(id: BSONObjectID): Action[AnyContent] = Action.async {
     implicit request =>
-
       authorised(AuthProviders(PrivilegedApplication)) {
       form.bindFromRequest().fold(
         (formWithErrors: Form[_]) =>
-            Future.successful(Ok(views.html.reply(appConfig, formWithErrors, id, formWithErrors.data.get("identifier").get, formWithErrors.data.get("content")))),
-
+          Future.successful(
+            BadRequest(
+              views.html.reply(
+                appConfig, formWithErrors, id,
+                formWithErrors.data.get("identifier").get,
+                formWithErrors.data.get("content")))),
         (replyDetails) => {
-
           Logger.debug(s"replyDetails: ${replyDetails}")
           twoWayMessageConnector.postMessage(replyDetails, id.stringify).map {
             case _  => Redirect(routes.ReplyFeedbackSuccessController.onPageLoad(id))
@@ -76,6 +78,7 @@ class ReplyController @Inject()(appConfig: FrontendAppConfig,
       )
       }.recoverWith {
         case _: NoActiveSession => strideUtil.redirectToStrideLogin()
+        case _: UnsupportedAuthProvider => strideUtil.redirectToStrideLogin()
       }
   }
 }

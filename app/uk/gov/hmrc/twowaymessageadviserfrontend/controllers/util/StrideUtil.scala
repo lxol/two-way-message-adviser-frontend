@@ -28,11 +28,9 @@ import scala.concurrent.Future
 class StrideUtil @Inject()(val env: Environment, val config: Configuration) extends AuthRedirects{
 
   def redirectToStrideLogin()(implicit request: Request[AnyContent]) = {
-
     config.getBoolean("includeHostInRedirect") match {
       case Some(true) => Future.successful(toStrideLogin( s"http://${request.host}${request.uri}"))
       case _ => Future.successful(toStrideLogin(request.uri))
     }
-
   }
 }

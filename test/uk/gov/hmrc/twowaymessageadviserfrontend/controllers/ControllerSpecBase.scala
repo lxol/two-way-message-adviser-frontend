@@ -20,5 +20,4 @@ import base.SpecBase
 
 trait ControllerSpecBase extends SpecBase {
 
-
 }

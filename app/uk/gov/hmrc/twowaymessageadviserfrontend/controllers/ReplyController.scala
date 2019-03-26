@@ -47,28 +47,29 @@ class ReplyController @Inject()(appConfig: FrontendAppConfig,
   val form: Form[ReplyDetails] = formProvider()
 
   def onPageLoad(id: BSONObjectID): Action[AnyContent] = Action.async {
-      implicit request =>
+    implicit request =>
       authorised(AuthProviders(PrivilegedApplication)) {
-        twoWayMessageConnector.retrieveRecipientIdentifier(id.stringify).map {
-          identifier => Ok(views.html.reply(appConfig, form, id, identifier, Option.empty))
-        }
+        for {
+          identifier <- twoWayMessageConnector.retrieveRecipientIdentifier(id.stringify)
+          partial <- twoWayMessageConnector.loadMessagePartial(id.stringify)
+        } yield ( Ok(views.html.reply(appConfig, form, id, identifier, Option.empty, partial)))
       }.recoverWith {
         case _: NoActiveSession => strideUtil.redirectToStrideLogin()
         case _: UnsupportedAuthProvider => strideUtil.redirectToStrideLogin()
       }
-    }
+  }
 
   def onSubmit(id: BSONObjectID): Action[AnyContent] = Action.async {
     implicit request =>
       authorised(AuthProviders(PrivilegedApplication)) {
       form.bindFromRequest().fold(
         (formWithErrors: Form[_]) =>
-          Future.successful(
-            BadRequest(
-              views.html.reply(
-                appConfig, formWithErrors, id,
-                formWithErrors.data.get("identifier").get,
-                formWithErrors.data.get("content")))),
+            for {
+                partial <- twoWayMessageConnector.loadMessagePartial(id.stringify)
+            } yield { BadRequest( views.html.reply(
+                            appConfig, formWithErrors, id,
+                            formWithErrors.data.get("identifier").get,
+                            formWithErrors.data.get("content"), partial))},
         (replyDetails) => {
           Logger.debug(s"replyDetails: ${replyDetails}")
           twoWayMessageConnector.postMessage(replyDetails, id.stringify).map {

@@ -63,12 +63,14 @@ class ReplyControllerSpec extends ControllerSpecBase with MockAuthConnector with
       result.header.headers.get("Location") mustBe Some("/stride/sign-in?successURL=http%3A%2F%2F%2F&origin=two-way-message-adviser-frontend")
     }
 
-    "Given request to onload when request is authorised, return reply screen" in {
+    "Given request to onload when request is authorised, return reply screen with original customer message" in {
       mockAuthorise(AuthProviders(PrivilegedApplication))(Future.successful(Some("")))
       mockSuccessfulMetadata(ID.stringify)(hc)
+      mockSuccessfulMessagePartial(ID.stringify)(hc)
       val result = call(controller.onPageLoad(ID), fakeRequest)
 
       contentAsString(result) contains "<h1 class=\"heading-large\">Reply to a secure question</h1>"
+      contentAsString(result) contains s"${messagePartial}"
     }
   }
 
@@ -84,6 +86,7 @@ class ReplyControllerSpec extends ControllerSpecBase with MockAuthConnector with
       val badRequestWithFormData: FakeRequest[AnyContentAsFormUrlEncoded] =
         fakeReplyRequest
           .withFormUrlEncodedBody("content" -> "content " * 50, "identifier" -> "P800")
+      mockSuccessfulMessagePartial(ID.stringify)(hc)
       mockAuthorise(AuthProviders(PrivilegedApplication))(Future.successful(Some("")))
       mockPostMessage(ID.stringify)(hc)
 
@@ -93,15 +96,17 @@ class ReplyControllerSpec extends ControllerSpecBase with MockAuthConnector with
 
     }
 
-    "Given authorised request with badly formed form - then expect error" in {
+    "Given authorised request with badly formed form - then expect error and original customer message" in {
       val badRequestWithFormData: FakeRequest[AnyContentAsFormUrlEncoded] =
         fakeReplyRequest
           .withFormUrlEncodedBody("content" -> "not enough content", "identifier" -> "p800")
       mockAuthorise(AuthProviders(PrivilegedApplication))(Future.successful(Some("")))
+      mockSuccessfulMessagePartial(ID.stringify)(hc)
       mockPostMessage(ID.stringify)(hc)
 
       val result = call(controller.onSubmit(ID), badRequestWithFormData)
       contentAsString(result) contains "<a href=\"#content\">Minimum length is 100</a>"
+      contentAsString(result) contains s"${messagePartial}"
     }
   }
 }

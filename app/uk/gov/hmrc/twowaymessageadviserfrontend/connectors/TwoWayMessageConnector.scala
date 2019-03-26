@@ -17,14 +17,15 @@
 package uk.gov.hmrc.twowaymessageadviserfrontend.connectors
 
 import javax.inject.Inject
-
 import models.ReplyDetails
 import org.apache.commons.codec.binary.Base64
-import play.api.libs.json.Json
 import play.api.{Configuration, Environment}
+import play.api.libs.json.Json
 import uk.gov.hmrc.http.{HeaderCarrier, HttpReads, HttpResponse}
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import uk.gov.hmrc.play.config.ServicesConfig
+import uk.gov.hmrc.play.partials.HtmlPartial.connectionExceptionsAsHtmlPartialFailure
+import uk.gov.hmrc.play.partials.{HeaderCarrierForPartialsConverter, HtmlPartial}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -43,9 +44,15 @@ class TwoWayMessageConnector @Inject()(httpClient: HttpClient,
   }
 
   def retrieveRecipientIdentifier(originalMessageId: String)(implicit hc: HeaderCarrier): Future[String] = {
-    httpClient.GET(s"$twoWayMessageBaseUrl/two-way-message/message/adviser/recipient-metadata/$originalMessageId")(hc = hc.withExtraHeaders(("Content-Type", "application/json")), ec = ec, rds = HttpReads.readRaw)
+    httpClient.GET[HttpResponse](s"$twoWayMessageBaseUrl/two-way-message/message/adviser/recipient-metadata/${originalMessageId}")
       .map(e => {
         (Json.parse(e.body) \ "recipient" \ "identifier" \ "value").as[String]
       })
   }
+
+  def loadMessagePartial(messageId: String)(implicit hc: HeaderCarrier): Future[HtmlPartial] =
+    httpClient.GET[HtmlPartial](url(s"/two-way-message/message/adviser/message-content/${messageId}"))
+      .recover {connectionExceptionsAsHtmlPartialFailure}
+
+  private def url(path: String) = baseUrl("two-way-message") + path
 }

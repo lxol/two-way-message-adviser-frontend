@@ -18,12 +18,15 @@
 @import uk.gov.hmrc.play.views.html._
 @import controllers.routes._
 @import utils.FormHelpers
+@import uk.gov.hmrc.play.partials.HtmlPartial
 
 @import utils.InputOption
 
 @import reactivemongo.bson.BSONObjectID
 
-@(appConfig: FrontendAppConfig, form: Form[_], id: BSONObjectID, identifier: String, content: Option[String])(implicit request: Request[_], messages: Messages)
+@import play.twirl.api.Html
+
+@(appConfig: FrontendAppConfig, form: Form[_], id: BSONObjectID, identifier: String, content: Option[String], contentPartial: HtmlPartial)(implicit request: Request[_], messages: Messages)
 
 @main_template(
     title = messages("reply.title"),
@@ -47,6 +50,8 @@
            )
 
         @components.submit_button()
+
+        @contentPartial.successfulContentOrElse(Html("Sorry, there's been a problem retrieving message content."))
 
 }
 

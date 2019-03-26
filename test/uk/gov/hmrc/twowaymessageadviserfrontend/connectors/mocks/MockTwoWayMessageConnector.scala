@@ -25,6 +25,8 @@ import org.scalatest.{BeforeAndAfterEach, Suite}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.twowaymessageadviserfrontend.connectors.TwoWayMessageConnector
 
+import uk.gov.hmrc.play.partials.HtmlPartial
+
 import scala.concurrent.{ExecutionContext, Future}
 
 trait MockTwoWayMessageConnector extends BeforeAndAfterEach with MockitoSugar {
@@ -34,6 +36,16 @@ trait MockTwoWayMessageConnector extends BeforeAndAfterEach with MockitoSugar {
 
   def mockSuccessfulMetadata(id: String)(hc: HeaderCarrier): Unit = {
     when(mockTwoWayMessageConnector.retrieveRecipientIdentifier(equalsMock(id))(any[HeaderCarrier])).thenReturn(Future.successful("AB123450"))
+  }
+
+  val messageContent = "<h>FakePartial</h>"
+
+  val response = HttpResponse(responseStatus = 200, responseString = Some(messageContent))
+
+  val messagePartial = HtmlPartial.readsPartial.read("someMethod", "someUrl", response)
+
+  def mockSuccessfulMessagePartial(id: String)(hc: HeaderCarrier): Unit = {
+    when(mockTwoWayMessageConnector.loadMessagePartial(equalsMock(id))(any[HeaderCarrier])).thenReturn(Future.successful(messagePartial))
   }
 
   def mockPostMessage(id: String)(hc:HeaderCarrier): Unit = {

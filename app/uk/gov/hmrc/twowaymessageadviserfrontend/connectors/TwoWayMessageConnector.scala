@@ -17,14 +17,15 @@
 package uk.gov.hmrc.twowaymessageadviserfrontend.connectors
 
 import javax.inject.Inject
-
 import models.ReplyDetails
 import org.apache.commons.codec.binary.Base64
-import play.api.libs.json.Json
+import play.api.libs.json.{JsError, Json}
 import play.api.{Configuration, Environment}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpReads, HttpResponse}
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import uk.gov.hmrc.play.config.ServicesConfig
+import uk.gov.hmrc.twowaymessageadviserfrontend.model.Message
+import uk.gov.hmrc.twowaymessageadviserfrontend.model.MessageFormat._
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -49,6 +50,12 @@ class TwoWayMessageConnector @Inject()(httpClient: HttpClient,
       })
   }
 
-  def getMessages(messageId: String)(implicit hc: HeaderCarrier): Future[HttpResponse] =
+  def getMessages(messageId: String)(implicit hc: HeaderCarrier): Future[List[Message]] =
         httpClient.GET(s"${twoWayMessageBaseUrl}/message/messages-list/$messageId")
+            .flatMap {
+                response => response.json.validate[List[Message]].fold(
+                    errors => Future.failed(new Exception(Json stringify JsError.toJson(errors))),
+                    msgList => Future.successful(msgList))
+        }
+
 }

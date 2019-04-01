@@ -34,6 +34,9 @@ import uk.gov.hmrc.twowaymessageadviserfrontend.connectors.TwoWayMessageConnecto
 
 import scala.concurrent.{ExecutionContext, Future}
 
+import uk.gov.hmrc.twowaymessageadviserfrontend.model.Message
+import uk.gov.hmrc.twowaymessageadviserfrontend.model.MessageFormat._
+
 class TwoWayMessageConnectorSpec extends SpecBase with MockitoSugar with Fixtures  {
 
   lazy implicit val hc = new HeaderCarrier()
@@ -57,14 +60,14 @@ class TwoWayMessageConnectorSpec extends SpecBase with MockitoSugar with Fixture
 
     "respond with body of the successfull request to the two-way-message microservice" in {
       val messageId = "1234567890"
-      val replyJson = Json.parse("{}")
+      val messagesStr = v3Messages("123", "321")
+      val messages:List[Message] = Json.parse(messagesStr).validate[List[Message]].get
       when(mockHttpClient.GET(endsWith(s"/message/messages-list/${messageId}"))
         (rds = any[HttpReads[HttpResponse]], hc = any[HeaderCarrier], ec = any[ExecutionContext]))
-        .thenReturn(Future.successful(HttpResponse(200, Some(replyJson))))
+        .thenReturn(Future.successful(HttpResponse(200, Some(Json.parse(messagesStr)), Map.empty, None)))
 
-      val result = await(twoWayMessageConnector.getMessages(messageId))
-      result.status mustBe(200)
-      result.json mustBe(replyJson)
+      val result:List[Message] = await(twoWayMessageConnector.getMessages(messageId))
+      result mustBe(messages)
     }
   }
 }

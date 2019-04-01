@@ -14,170 +14,57 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.twowaymessage.connectors
+package connectors
 
 import base.SpecBase
-import com.github.tomakehurst.wiremock.WireMockServer
-import com.github.tomakehurst.wiremock.client.WireMock
-import com.github.tomakehurst.wiremock.core.WireMockConfiguration._
-import org.scalatest._
+import com.google.inject.AbstractModule
+import net.codingwell.scalaguice.ScalaModule
+import org.mockito.ArgumentMatchers.{any, _}
+import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
-import uk.gov.hmrc.http.HeaderCarrier
+import play.api.Mode.Mode
+import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.libs.json.Json
+import play.api.test.Helpers._
+import play.api.{Application, Mode}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpReads, HttpResponse}
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import uk.gov.hmrc.twowaymessageadviserfrontend.assets.Fixtures
 import uk.gov.hmrc.twowaymessageadviserfrontend.connectors.TwoWayMessageConnector
-import uk.gov.hmrc.twowaymessageadviserfrontend.model.{Message, _}
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
-class TwoWayMessageConnectorSpec extends SpecBase with WithWireMock with Fixtures with MockitoSugar {
+class TwoWayMessageConnectorSpec extends SpecBase with MockitoSugar with Fixtures  {
 
-  lazy val mockhttpClient = mock[HttpClient]
-  implicit lazy val mockHeaderCarrier = new HeaderCarrier()
-  lazy implicit val ec = mock[ExecutionContext]
+  lazy implicit val hc = new HeaderCarrier()
+  lazy val mockHttpClient = mock[HttpClient]
 
-  val messageConnector = injector.instanceOf[TwoWayMessageConnector]
+  override def fakeApplication(): Application = {
 
-  val messageExample = Message(
-    ExternalRef(
-      "123412342314",
-      "2WSM-CUSTOMER"
-    ),
-    Recipient(
-      TaxIdentifier(
-        "HMRC-NI",
-        "AB123456C"
-      ),
-      "someEmail@test.com"
-    ),
-    MessageType.Customer,
-    "SUBJECT",
-    "SGVsbG8gV29ybGQ=",
-    Details(FormId.Question)
-  )
-
-  // "POST message connector" should {
-
-  //   "return 201" in {
-  //     val jsonResponseBody =
-  //       """
-  //         |{
-  //         |   "externalRef":{
-  //         |      "id":"123412342314",
-  //         |      "source":"2WSM-CUSTOMER"
-  //         |   },
-  //         |   "recipient":{
-  //         |      "taxIdentifier":{
-  //         |         "name":"HMRC-NI",
-  //         |         "value":"AB123456C"
-  //         |      },
-  //         |      "email":"someEmail@test.com"
-  //         |   },
-  //         |   "messageType":"2wsm-customer",
-  //         |   "subject":"SUBJECT",
-  //         |   "content":"SGVsbG8gV29ybGQ=",
-  //         |   "details":{
-  //         |      "formId":"2WSM-question"
-  //         |   }
-  //         |}
-  //       """.stripMargin
-
-  //     givenThat(
-  //       post(urlEqualTo("/messages"))
-  //         .withRequestBody(equalToJson(jsonResponseBody))
-  //         .willReturn(aResponse().withStatus(Status.CREATED)))
-
-  //     val result = await(messageConnector.postMessage(messageExample)(new HeaderCarrier()))
-  //     result.status shouldBe (201)
-  //   }
-  //   SharedMetricRegistries.clear
-  // }
-
-  // "GET message metadata via message connector" should {
-
-  //   "returns 200 successfully for a valid replyTo message identifier" in {
-  //     val jsonResponseBody =
-  //       """
-  //         |{
-  //         |   "id": "5c18eb166f0000110204b160",
-  //         |   "recipient": {
-  //         |      "regime": "REGIME",
-  //         |      "identifier": {
-  //         |         "name":"HMRC-NI",
-  //         |         "value":"AB123456C"
-  //         |      },
-  //         |      "email":"someEmail@test.com"
-  //         |   },
-  //         |   "subject":"SUBJECT",
-  //         |   "details": {
-  //         |     "threadId":"5d12eb115f0000000205c150",
-  //         |     "enquiryType":"p800",
-  //         |     "adviser": {
-  //         |       "pidId":"adviser-id"
-  //         |     }
-  //         |   }
-  //         |}
-  //       """.stripMargin
-
-  //     val replyTo = "replyToId"
-  //     givenThat(
-  //       get(urlEqualTo(s"/messages/$replyTo/metadata"))
-  //         .willReturn(
-  //           aResponse()
-  //             .withStatus(Status.OK)
-  //             .withBody(jsonResponseBody)))
-
-  //     val httpResult = await(messageConnector.getMessageMetadata(replyTo)(new HeaderCarrier()))
-  //     httpResult.status shouldBe (200)
-  //     Json.parse(httpResult.body).validate[MessageMetadata] shouldBe a[JsSuccess[MessageMetadata]]
-  //   }
-  //   SharedMetricRegistries.clear
-  // }
-
-  // "GET list of messages via message connector" should {
-
-  //   "returns 200 successfully for a valid messageId" in {
-  //     val jsonResponseBody = v3Messages("123456", "654321")
-
-  //     val messageId = "5d12eb115f0000000205c150"
-  //     givenThat(
-  //       get(urlEqualTo(s"/messages/messages-list/${messageId}"))
-  //         .willReturn(
-  //           aResponse()
-  //             .withStatus(Status.OK)
-  //             .withBody(jsonResponseBody)))
-
-  //     val httpResult = await(messageConnector.getMessages(messageId)(new HeaderCarrier()))
-  //     httpResult.status shouldBe (200)
-  //     Json.parse(httpResult.body).validate[List[Message]] shouldBe a[JsSuccess[List[Message]]]
-  //   }
-  //   SharedMetricRegistries.clear
-  // }
-}
-
-
-trait WithWireMock extends BeforeAndAfterAll with BeforeAndAfterEach {
-  suite: Suite =>
-
-  def dependenciesPort = 8910
-
-  lazy val wireMockServer = new WireMockServer(wireMockConfig().port(dependenciesPort))
-
-  override def beforeAll(): Unit = {
-    super.beforeAll()
-    wireMockServer.start()
-    WireMock.configureFor(dependenciesPort)
+    new GuiceApplicationBuilder()
+      .overrides(new AbstractModule with ScalaModule {
+        override def configure(): Unit = {
+          bind[Mode].toInstance(Mode.Test)
+          bind[HttpClient].toInstance(mockHttpClient)
+        }
+      })
+      .build()
   }
 
-  override def beforeEach(): Unit = {
-    super.beforeEach()
-    wireMockServer.resetMappings()
-    wireMockServer.resetRequests()
-  }
+  val twoWayMessageConnector = injector.instanceOf[TwoWayMessageConnector]
 
-  override def afterAll(): Unit = {
-    super.afterAll()
-    wireMockServer.stop()
-  }
+  "twoWayMessageConnector.getMessages" should {
 
+    "respond with body of the successfull request to the two-way-message microservice" in {
+      val messageId = "1234567890"
+      val replyJson = Json.parse("{}")
+      when(mockHttpClient.GET(endsWith(s"/message/messages-list/${messageId}"))
+        (rds = any[HttpReads[HttpResponse]], hc = any[HeaderCarrier], ec = any[ExecutionContext]))
+        .thenReturn(Future.successful(HttpResponse(200, Some(replyJson))))
+
+      val result = await(twoWayMessageConnector.getMessages(messageId))
+      result.status mustBe(200)
+      result.json mustBe(replyJson)
+    }
+  }
 }

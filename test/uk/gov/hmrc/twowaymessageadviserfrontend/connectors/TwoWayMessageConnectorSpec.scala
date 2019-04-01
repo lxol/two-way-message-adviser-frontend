@@ -85,5 +85,18 @@ class TwoWayMessageConnectorSpec extends SpecBase with MockitoSugar with Fixture
             ex.getMessage must include("""error.expected.jsarray""")
         }
     }
+
+    "forward an exception from 2wsm" in {
+        val messageId = "1234567890"
+        val testMessage = "test exception"
+        when(mockHttpClient.GET(endsWith(s"/message/messages-list/${messageId}"))
+        (rds = any[HttpReads[HttpResponse]], hc = any[HeaderCarrier], ec = any[ExecutionContext]))
+            .thenReturn(Future.failed(new Exception(testMessage)))
+
+        ScalaFutures.whenReady(twoWayMessageConnector.getMessages(messageId).failed) { ex =>
+            ex mustBe a[Exception]
+            ex.getMessage must be(testMessage)
+        }
+    }
   }
 }

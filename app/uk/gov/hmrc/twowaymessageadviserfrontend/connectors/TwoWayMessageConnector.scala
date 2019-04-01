@@ -48,4 +48,7 @@ class TwoWayMessageConnector @Inject()(httpClient: HttpClient,
         (Json.parse(e.body) \ "recipient" \ "identifier" \ "value").as[String]
       })
   }
+
+  def getMessages(messageId: String)(implicit hc: HeaderCarrier): Future[HttpResponse] =
+        httpClient.GET(s"${twoWayMessageBaseUrl}/message/messages-list/$messageId")
 }

@@ -22,7 +22,7 @@ object AppDependencies {
     "org.jsoup"               %  "jsoup"                    % "1.10.2"                % "test",
     "org.mockito" % "mockito-core" % "2.23.4" % "test",
     "org.pegdown"             %  "pegdown"                  % "1.6.0"                 % "test, it",
-    "org.scalatest"           %% "scalatest"                % "3.0.4"                 % "test",
+    "org.scalatest"           %% "scalatest"                % "3.0.5"                 % "test",
     "org.scalatest" %% "scalatest" % "3.0.5" % "test",
     "net.codingwell" %% "scala-guice" % "4.2.2" % "test",
 

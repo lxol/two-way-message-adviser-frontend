@@ -36,6 +36,9 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import uk.gov.hmrc.twowaymessageadviserfrontend.model.Message
 import uk.gov.hmrc.twowaymessageadviserfrontend.model.MessageFormat._
+import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.concurrent.ScalaFutures._
+
 
 class TwoWayMessageConnectorSpec extends SpecBase with MockitoSugar with Fixtures  {
 
@@ -58,7 +61,7 @@ class TwoWayMessageConnectorSpec extends SpecBase with MockitoSugar with Fixture
 
   "twoWayMessageConnector.getMessages" should {
 
-    "respond with body of the successfull request to the two-way-message microservice" in {
+    "respond with  a list of messages if valid input from 2wsm" in {
       val messageId = "1234567890"
       val messagesStr = v3Messages("123", "321")
       val messages:List[Message] = Json.parse(messagesStr).validate[List[Message]].get
@@ -68,6 +71,19 @@ class TwoWayMessageConnectorSpec extends SpecBase with MockitoSugar with Fixture
 
       val result:List[Message] = await(twoWayMessageConnector.getMessages(messageId))
       result mustBe(messages)
+    }
+
+    "return a failed future with a json validation exception if can not parse input messages from 2wsm" in {
+        val messageId = "1234567890"
+        val invalidMessagesStr = "{}"
+        when(mockHttpClient.GET(endsWith(s"/message/messages-list/${messageId}"))
+        (rds = any[HttpReads[HttpResponse]], hc = any[HeaderCarrier], ec = any[ExecutionContext]))
+            .thenReturn(Future.successful(HttpResponse(200, Some(Json.parse(invalidMessagesStr)), Map.empty, None)))
+
+        ScalaFutures.whenReady(twoWayMessageConnector.getMessages(messageId).failed) { ex =>
+            ex mustBe a[Exception]
+            ex.getMessage must include("""error.expected.jsarray""")
+        }
     }
   }
 }

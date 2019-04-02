@@ -70,7 +70,7 @@ class MessageFormatSpec extends WordSpec with Fixtures with Matchers {
   "Message json reader" should {
     "read v3 message as defined in message microservice " in {
       val extrefid = "123456"
-      val json = Json.parse(v3Message(s"${extrefid}"))
+      val json = Json.parse(messageString(s"${extrefid}"))
       val messageResult = json.validate[Message]
 
       //messageResult should (matchPattern { case _:JsSuccess[Message] =>})
@@ -80,7 +80,7 @@ class MessageFormatSpec extends WordSpec with Fixtures with Matchers {
     "read v3 messages as defined in message microservice " in {
       val extrefid1 = "123456"
       val extrefid2 = "654321"
-      val json = Json.parse(v3Messages(extrefid1, extrefid2))
+      val json = Json.parse(messagesString(extrefid1, extrefid2))
       val messageResult = json.validate[List[Message]]
       messageResult.get.head.externalRef.id should be(extrefid1)
     }

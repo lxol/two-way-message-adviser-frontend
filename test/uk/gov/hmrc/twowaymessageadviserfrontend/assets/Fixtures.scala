@@ -34,7 +34,7 @@ trait Fixtures {
       Some(Adviser(pidId = "adviser-id")))
   )
 
-  def v3Message(externalRefId:String) =
+  def messageString(externalRefId:String) =
     s"""
            |{
            |   "externalRef":{
@@ -63,12 +63,11 @@ trait Fixtures {
            |}
     """.stripMargin
 
-  def v3Messages(externalRefId1:String, externalRefId2: String) =
+  def messagesString(externalRefId1:String, externalRefId2: String) =
     s"""
            | [
-           | ${v3Message(externalRefId1)},
-           | ${v3Message(externalRefId2)}
+           | ${messageString(externalRefId1)},
+           | ${messageString(externalRefId2)}
            | ]
          """.stripMargin
-
 }

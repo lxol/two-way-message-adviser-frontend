@@ -63,7 +63,7 @@ class TwoWayMessageConnectorSpec extends SpecBase with MockitoSugar with Fixture
 
     "respond with  a list of messages if valid input from 2wsm" in {
       val messageId = "1234567890"
-      val messagesStr = v3Messages("123", "321")
+      val messagesStr = messagesString("123", "321")
       val messages:List[Message] = Json.parse(messagesStr).validate[List[Message]].get
       when(mockHttpClient.GET(endsWith(s"/message/messages-list/${messageId}"))
         (rds = any[HttpReads[HttpResponse]], hc = any[HeaderCarrier], ec = any[ExecutionContext]))

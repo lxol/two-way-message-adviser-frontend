@@ -14,12 +14,68 @@
  * limitations under the License.
  */
 
-package models
+package uk.gov.hmrc.twowaymessageadviserfrontend.models
 
 import play.api.libs.json._
+import play.api.Logger
 
-case class ReplyDetails (content: String)
+import scala.io.Source
+import scala.language.implicitConversions
+import scala.util.{Failure, Success, Try}
+import scala.xml._
+import scala.xml.parsing.XhtmlParser
+import scala.xml.transform.RewriteRule
+
+case class ReplyDetails(content: String)
 
 object ReplyDetails {
-  implicit val format = Json.format[ReplyDetails]
+  implicit val format: OFormat[ReplyDetails] = Json.format[ReplyDetails]
+}
+
+case class EditReplyDetails(content: String) {
+
+  private def stringToXhtml(string: String): Try[Seq[Node]] = {
+    val xhtmlString = s"<html>$string</html>"
+    try {
+      val parser = new XhtmlParser(Source.fromString(xhtmlString))
+      val doc = parser.initialize.document()
+      Success(doc.docElem.child)
+    } catch {
+      case e: Throwable => Failure(e)
+    }
+  }
+
+  private val addListClass = new RewriteRule {
+    override def transform(n: Node): Seq[Node] = n match {
+      case elem: Elem if elem.label == "ol"  =>
+        elem.copy(attributes = new UnprefixedAttribute("class","list list-number",Null), child = elem.child)
+      case elem: Elem if elem.label == "ul" =>
+        elem.copy(attributes = new UnprefixedAttribute("class","list list-bullet",Null), child = elem.child)
+      case `n` => n
+    }
+  }
+
+  private def updateLists(nodes: Seq[Node]): Seq[Node] = {
+    nodes.flatMap(node => addListClass(node))
+  }
+
+  def getContent: String = {
+    stringToXhtml(content) match {
+      case Success(nodes) => updateLists(nodes).mkString
+      case Failure(e) =>
+        Logger.error(s"Failed to parse content due to: ${e.getMessage}")
+        ""
+    }
+  }
+
+  def validate(content: String): Boolean = {
+    stringToXhtml(content) match {
+      case Success(_) => true
+      case Failure(_) => false
+    }
+  }
+}
+
+object EditReplyDetails {
+  implicit val format: OFormat[EditReplyDetails] = Json.format[EditReplyDetails]
 }

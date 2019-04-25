@@ -30,11 +30,12 @@ reply.whatis = Type of the question
 reply.dropdown.p1 = Help with Self Assessment
 reply.dropdown.p2 = Help with Child Care
 reply.dropdown.p3 = Other Query
+reply.feedbackSuccess.title = Message Sent
 reply.feedbackSuccess.heading = Message Sent
 reply.feedbackSuccess.p1 = We have added your reply to the message in the customer's personal tax account.
 reply.feedbackSuccess.p2 = We're also sending an email to the customer to tell them a reply is waiting to be read.
-
-reply.content = Reply
+reply.title = Reply to a secure question
+reply.content = Reply to a secure question
 
 unauthorised.title = You can’t access this service with this account
 unauthorised.heading = You can’t access this service with this account

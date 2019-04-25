@@ -30,10 +30,12 @@
 @import uk.gov.hmrc.play.views.html.{layouts => uiLayouts}
 @import uk.gov.hmrc.play.views.html.{helpers => uiHelpers}
 
+@scripts = {<script src="@routes.Assets.versioned("javascripts/ckeditor.js")"></script>}
+
 @head = {
     @uiLayouts.head(
       linkElem = None,
-      headScripts = None)
+      headScripts = Some(scripts))
     <meta name="format-detection" content="telephone=no" />
 }
 

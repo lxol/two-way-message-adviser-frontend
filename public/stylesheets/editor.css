@@ -1,0 +1,8 @@
+body,header {display:block;margin:20px;font-family:Arial,sans-serif;font-size:1em;color:black;}
+ul {
+  list-style-type: disc;
+  padding-left: 20px; }
+
+ol {
+  list-style-type: decimal;
+  padding-left: 20px; }

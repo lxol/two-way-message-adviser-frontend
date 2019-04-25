@@ -16,18 +16,16 @@
 
 package uk.gov.hmrc.twowaymessageadviserfrontend.connectors.mocks
 
-import org.mockito.ArgumentMatchers.any
-import org.mockito.ArgumentMatchers.{eq => equalsMock}
-import models.ReplyDetails
+import org.mockito.ArgumentMatchers.{any, eq => equalsMock}
 import org.mockito.Mockito.{reset, when}
-import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterEach, Suite}
+import org.scalatest.mockito.MockitoSugar
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
-import uk.gov.hmrc.twowaymessageadviserfrontend.connectors.TwoWayMessageConnector
-
 import uk.gov.hmrc.play.partials.HtmlPartial
+import uk.gov.hmrc.twowaymessageadviserfrontend.connectors.TwoWayMessageConnector
+import uk.gov.hmrc.twowaymessageadviserfrontend.models.{EditReplyDetails, ReplyDetails}
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 trait MockTwoWayMessageConnector extends BeforeAndAfterEach with MockitoSugar {
   self: Suite =>
@@ -42,18 +40,18 @@ trait MockTwoWayMessageConnector extends BeforeAndAfterEach with MockitoSugar {
 
   val response = HttpResponse(responseStatus = 200, responseString = Some(messageContent))
 
-  val messagePartial = HtmlPartial.readsPartial.read("someMethod", "someUrl", response)
+  val messagePartial: HtmlPartial = HtmlPartial.readsPartial.read("someMethod", "someUrl", response)
 
   def mockSuccessfulMessagePartial(id: String)(hc: HeaderCarrier): Unit = {
     when(mockTwoWayMessageConnector.loadMessagePartial(equalsMock(id))(any[HeaderCarrier])).thenReturn(Future.successful(messagePartial))
   }
 
   def mockPostMessage(id: String)(hc:HeaderCarrier): Unit = {
-    when(mockTwoWayMessageConnector.postMessage(any[ReplyDetails], equalsMock((id)))(any[HeaderCarrier]))
+    when(mockTwoWayMessageConnector.postMessage(any[ReplyDetails], equalsMock(id))(any[HeaderCarrier]))
       .thenReturn(Future.successful(mock[HttpResponse]))
   }
 
-  def mock(replyDetails: ReplyDetails, id: String): Unit = {
+  def mock(replyDetails: EditReplyDetails, id: String): Unit = {
     ()
   }
 

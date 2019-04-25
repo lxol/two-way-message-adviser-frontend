@@ -17,15 +17,15 @@
 package uk.gov.hmrc.twowaymessageadviserfrontend.connectors
 
 import javax.inject.Inject
-import models.ReplyDetails
 import org.apache.commons.codec.binary.Base64
-import play.api.{Configuration, Environment}
+import play.api.{Configuration, Environment, Mode}
 import play.api.libs.json.Json
-import uk.gov.hmrc.http.{HeaderCarrier, HttpReads, HttpResponse}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import uk.gov.hmrc.play.config.ServicesConfig
+import uk.gov.hmrc.play.partials.HtmlPartial
 import uk.gov.hmrc.play.partials.HtmlPartial.connectionExceptionsAsHtmlPartialFailure
-import uk.gov.hmrc.play.partials.{HeaderCarrierForPartialsConverter, HtmlPartial}
+import uk.gov.hmrc.twowaymessageadviserfrontend.models.{EditReplyDetails, ReplyDetails}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -34,24 +34,35 @@ class TwoWayMessageConnector @Inject()(httpClient: HttpClient,
                                        val environment: Environment)(implicit ec: ExecutionContext)
   extends ServicesConfig {
 
-  override protected def mode = environment.mode
+  override protected def mode: Mode.Mode = environment.mode
 
   lazy val twoWayMessageBaseUrl: String = baseUrl("two-way-message")
 
+  /**
+    *Posts the text content from the adviser reply form to the two-way-message service
+    */
   def postMessage(reply: ReplyDetails, replyTo: String)(implicit hc: HeaderCarrier): Future[HttpResponse] = {
     val encodedReply = reply.copy(content = Base64.encodeBase64String(reply.content.getBytes("UTF-8")))
-    httpClient.POST(s"$twoWayMessageBaseUrl/two-way-message/message/advisor/${replyTo}/reply", encodedReply)
+    httpClient.POST(s"$twoWayMessageBaseUrl/two-way-message/message/advisor/$replyTo/reply", encodedReply)
+  }
+
+  /**
+    * Posts the html content from the adviser reply text editor to the two-way-message service
+    */
+  def postMessage(reply: EditReplyDetails, replyTo: String)(implicit hc: HeaderCarrier): Future[HttpResponse] = {
+    val encodedReply = reply.copy(content = Base64.encodeBase64String(reply.getContent.getBytes("UTF-8")))
+    httpClient.POST(s"$twoWayMessageBaseUrl/two-way-message/message/advisor/$replyTo/reply", encodedReply)
   }
 
   def retrieveRecipientIdentifier(originalMessageId: String)(implicit hc: HeaderCarrier): Future[String] = {
-    httpClient.GET[HttpResponse](s"$twoWayMessageBaseUrl/two-way-message/message/adviser/recipient-metadata/${originalMessageId}")
+    httpClient.GET[HttpResponse](s"$twoWayMessageBaseUrl/two-way-message/message/adviser/recipient-metadata/$originalMessageId")
       .map(e => {
         (Json.parse(e.body) \ "recipient" \ "identifier" \ "value").as[String]
       })
   }
 
   def loadMessagePartial(messageId: String)(implicit hc: HeaderCarrier): Future[HtmlPartial] =
-    httpClient.GET[HtmlPartial](url(s"/two-way-message/message/adviser/message-content/${messageId}"))
+    httpClient.GET[HtmlPartial](url(s"/two-way-message/message/adviser/message-content/$messageId"))
       .recover {connectionExceptionsAsHtmlPartialFailure}
 
   private def url(path: String) = baseUrl("two-way-message") + path

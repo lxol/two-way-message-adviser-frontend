@@ -18,17 +18,16 @@ package forms
 
 import forms.mappings.Mappings
 import javax.inject.Inject
-import models.ReplyDetails
 import play.api.data.Form
 import play.api.data.Forms._
+import uk.gov.hmrc.twowaymessageadviserfrontend.models.ReplyDetails
 
 class ReplyFormProvider @Inject() extends FormErrorHelper with Mappings {
 
-  def apply(): Form[ReplyDetails] =
-    Form(
-      mapping(
-        "content" -> nonEmptyText(minLength = 100)
-      )(ReplyDetails.apply)(ReplyDetails.unapply)
-    )
+  def apply(): Form[ReplyDetails] = Form(
+    mapping(
+      "content" -> nonEmptyText(minLength = 100)
+    )(ReplyDetails.apply)(ReplyDetails.unapply)
+  )
 
 }

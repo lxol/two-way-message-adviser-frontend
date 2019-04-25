@@ -42,17 +42,17 @@
     @helpers.form(action = ReplyController.onSubmit(id), 'autoComplete -> "off") {
         <input type="hidden" name='identifier' value="@{identifier}">
 
-           @components.input_textarea(
-               field = form("content"),
-               label = messages("reply.content"),
-               identifier = identifier,
-               content = content
-           )
+            @components.input_textarea(
+                field = form("content"),
+                label = messages("reply.content"),
+                identifier = identifier,
+                content = content
+            )
 
-        @components.submit_button()
+            @components.submit_button(false)
 
-        @contentPartial.successfulContentOrElse(Html("Sorry, there's been a problem retrieving message content."))
+            @contentPartial.successfulContentOrElse(Html("Sorry, there's been a problem retrieving message content."))
 
-}
+    }
 
 }

@@ -83,14 +83,14 @@ class ReplyControllerSpec extends ControllerSpecBase with MockAuthConnector with
     }
 
     "Given authorised request with well formed form - then expect success" in {
-      val badRequestWithFormData: FakeRequest[AnyContentAsFormUrlEncoded] =
+      val goodRequestWithFormData: FakeRequest[AnyContentAsFormUrlEncoded] =
         fakeReplyRequest
           .withFormUrlEncodedBody("content" -> "content " * 50, "identifier" -> "P800")
       mockSuccessfulMessagePartial(ID.stringify)(hc)
       mockAuthorise(AuthProviders(PrivilegedApplication))(Future.successful(Some("")))
       mockPostMessage(ID.stringify)(hc)
 
-      val result = await(call(controller.onSubmit(ID), badRequestWithFormData))
+      val result = await(call(controller.onSubmit(ID), goodRequestWithFormData))
       result.header.status mustBe 303
       result.header.headers.get("Location") mustBe Some(s"/two-way-message-adviser-frontend/message/submitted?id=${ID.stringify}")
 
@@ -99,7 +99,7 @@ class ReplyControllerSpec extends ControllerSpecBase with MockAuthConnector with
     "Given authorised request with badly formed form - then expect error and original customer message" in {
       val badRequestWithFormData: FakeRequest[AnyContentAsFormUrlEncoded] =
         fakeReplyRequest
-          .withFormUrlEncodedBody("content" -> "not enough content", "identifier" -> "p800")
+          .withFormUrlEncodedBody("adviser-reply" -> "not enough content", "identifier" -> "p800")
       mockAuthorise(AuthProviders(PrivilegedApplication))(Future.successful(Some("")))
       mockSuccessfulMessagePartial(ID.stringify)(hc)
       mockPostMessage(ID.stringify)(hc)

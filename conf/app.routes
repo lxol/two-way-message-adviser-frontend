@@ -9,3 +9,5 @@ POST       /message/submit               controllers.ReplyController.onSubmit(id
 GET        /message/submitted            controllers.ReplyFeedbackSuccessController.onPageLoad(id: reactivemongo.bson.BSONObjectID )
 
 GET        /language/:lang               controllers.LanguageSwitchController.switchToLanguage(lang: String)
+
+GET        /javascriptRoutes             controllers.ReplyController.javascriptRoutes

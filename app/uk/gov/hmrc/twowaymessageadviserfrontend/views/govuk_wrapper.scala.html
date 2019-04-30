@@ -30,7 +30,15 @@
 @import uk.gov.hmrc.play.views.html.{layouts => uiLayouts}
 @import uk.gov.hmrc.play.views.html.{helpers => uiHelpers}
 
-@scripts = {<script src="@routes.Assets.versioned("javascripts/ckeditor.js")"></script>}
+@scripts = {
+<script type="text/javascript">
+function CKEDITOR_GETURL( resource )
+{
+    jsRoutes.controllers.Assets.versioned(resource);
+}
+</script>
+<script type="text/javascript" src="@routes.ReplyController.javascriptRoutes"></script>
+<script src="@routes.Assets.versioned("javascripts/ckeditor.js")"></script>}
 
 @head = {
     @uiLayouts.head(

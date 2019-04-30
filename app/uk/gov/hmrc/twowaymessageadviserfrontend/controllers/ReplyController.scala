@@ -23,6 +23,8 @@ import play.api.{Configuration, Environment, Logger}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent}
+import play.api.routing.JavaScriptReverseRouter
+import play.Routes
 import reactivemongo.bson.BSONObjectID
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.AuthProvider.PrivilegedApplication
@@ -96,5 +98,11 @@ class ReplyController @Inject()(appConfig: FrontendAppConfig,
         case _: NoActiveSession => strideUtil.redirectToStrideLogin()
         case _: UnsupportedAuthProvider => strideUtil.redirectToStrideLogin()
       }
+  }
+
+  def javascriptRoutes: Action[AnyContent] = Action { implicit request =>
+    Ok(JavaScriptReverseRouter("jsRoutes")(
+      routes.javascript.Assets.versioned
+    )).as("text/javascript")
   }
 }

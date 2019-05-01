@@ -32,10 +32,9 @@
 
 @scripts = {
 <script type="text/javascript">
-function CKEDITOR_GETURL( resource )
-{
+var CKEDITOR_GETURL = function(resource) {
     jsRoutes.controllers.Assets.versioned(resource);
-}
+};
 </script>
 <script type="text/javascript" src="@routes.ReplyController.javascriptRoutes"></script>
 <script src="@routes.Assets.versioned("javascripts/ckeditor.js")"></script>}

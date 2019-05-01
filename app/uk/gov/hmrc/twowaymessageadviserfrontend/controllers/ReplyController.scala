@@ -35,7 +35,7 @@ import uk.gov.hmrc.twowaymessageadviserfrontend.forms.EditReplyFormProvider
 import uk.gov.hmrc.twowaymessageadviserfrontend.models.{EditReplyDetails, ReplyDetails}
 import uk.gov.hmrc.twowaymessageadviserfrontend.views
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class ReplyController @Inject()(appConfig: FrontendAppConfig,
   override val messagesApi: MessagesApi,
@@ -100,9 +100,15 @@ class ReplyController @Inject()(appConfig: FrontendAppConfig,
       }
   }
 
-  def javascriptRoutes: Action[AnyContent] = Action { implicit request =>
-    Ok(JavaScriptReverseRouter("jsRoutes")(
-      routes.javascript.Assets.versioned
-    )).as("text/javascript")
+  def javascriptRoutes: Action[AnyContent] = Action.async {
+    implicit request =>
+      authorised(AuthProviders(PrivilegedApplication)) {
+        Future.successful(Ok(JavaScriptReverseRouter("jsRoutes")(
+          routes.javascript.Assets.versioned
+        )).as("text/javascript"))
+      }.recoverWith {
+        case _: NoActiveSession => strideUtil.redirectToStrideLogin()
+        case _: UnsupportedAuthProvider => strideUtil.redirectToStrideLogin()
+      }
   }
 }

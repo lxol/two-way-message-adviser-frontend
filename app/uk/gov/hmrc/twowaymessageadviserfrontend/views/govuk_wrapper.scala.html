@@ -32,8 +32,19 @@
 
 @scripts = {
 <script type="text/javascript">
+function getAssetPath(resource) {
+    var searchStr = "javascripts/";
+    var pos = resource.lastIndexOf(searchStr);
+    if(pos != -1) {
+        return resource.slice(pos + searchStr.length, resource.length);
+    } else {
+        return resource;
+    }
+};
 var CKEDITOR_GETURL = function(resource) {
-    jsRoutes.controllers.Assets.versioned(resource);
+    var assetPath = getAssetPath(resource);
+    var r = jsRoutes.controllers.Assets.versioned('javascripts/' + assetPath);
+    return r.url;
 };
 </script>
 <script type="text/javascript" src="@routes.ReplyController.javascriptRoutes"></script>

@@ -32,6 +32,9 @@
 
 @scripts = {
 <script type="text/javascript">
+
+/* Ensures that CKEDitor correctly retrieves assets from Play. Without this function the URLs get concatenated,
+   suggesting that CKEDitor calls the getUrl function recursively internally */
 function getAssetPath(resource) {
     var searchStr = "javascripts/";
     var pos = resource.lastIndexOf(searchStr);
@@ -41,6 +44,9 @@ function getAssetPath(resource) {
         return resource;
     }
 };
+
+/* Overrides the default CKEditor getUrl functionality - see:
+   https://ckeditor.com/docs/ckeditor4/latest/api/CKEDITOR.html#method-getUrl */
 var CKEDITOR_GETURL = function(resource) {
     var assetPath = getAssetPath(resource);
     var r = jsRoutes.controllers.Assets.versioned('javascripts/' + assetPath);

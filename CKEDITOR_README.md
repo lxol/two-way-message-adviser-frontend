@@ -1,0 +1,3 @@
+**CKEditor 4** can be updated from [https://github.com/ckeditor/ckeditor-dev](https://github.com/ckeditor/ckeditor-dev)
+
+Run the build process described in [https://github.com/ckeditor/ckeditor-dev/blob/major/README.md](https://github.com/ckeditor/ckeditor-dev/blob/major/README.md) then copy all files and folders from the `dev/builder/release` directory to the public/javascript folder of `two-way-message-adviser-frontend`.

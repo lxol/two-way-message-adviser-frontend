@@ -26,7 +26,7 @@
 
 @import play.twirl.api.Html
 
-@(appConfig: FrontendAppConfig, form: Form[_], id: BSONObjectID, identifier: String, content: Option[String], contentPartial: HtmlPartial)(implicit request: Request[_], messages: Messages)
+@(appConfig: FrontendAppConfig, form: Form[_], id: BSONObjectID, identifier: String, content: Option[Html], contentPartial: HtmlPartial)(implicit request: Request[_], messages: Messages)
 
 @main_template(
     title = messages("reply.title"),
@@ -44,7 +44,7 @@
 
            @components.input_ckeditor(
                field = form("adviser-reply"),
-               label = messages("reply.content"),
+               label = messages("reply.label"),
                identifier = identifier,
                content = content
            )

@@ -35,7 +35,15 @@ reply.feedbackSuccess.heading = Message Sent
 reply.feedbackSuccess.p1 = We have added your reply to the message in the customer's personal tax account.
 reply.feedbackSuccess.p2 = We're also sending an email to the customer to tell them a reply is waiting to be read.
 reply.title = Reply to a secure question
-reply.content = Reply to a secure question
+reply.label = Reply to a secure question
+reply.text.para.1 = Dear {0}
+reply.text.para.2 = Thank you for your message of {0}.
+reply.text.para.3.1 = To recap your question, I think you\''re asking for help with
+reply.text.para.3.2 = I\''ve been looking into your question about
+reply.text.para.3.3 = As I understand it, you\''re looking for help with
+reply.text.para.4 = I believe this answers your question and hope you are satisfied with the response. There\''s no need to send a reply. But if you think there\''s something important missing, just ask another question about this below.
+reply.text.signature.1 = Regards
+reply.text.signature.2 = HMRC digital team
 
 unauthorised.title = You can’t access this service with this account
 unauthorised.heading = You can’t access this service with this account

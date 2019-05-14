@@ -20,6 +20,7 @@ import org.mockito.ArgumentMatchers.{any, eq => equalsMock}
 import org.mockito.Mockito.{reset, when}
 import org.scalatest.{BeforeAndAfterEach, Suite}
 import org.scalatest.mockito.MockitoSugar
+import play.api.http.Status
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.partials.HtmlPartial
 import uk.gov.hmrc.twowaymessageadviserfrontend.connectors.TwoWayMessageConnector
@@ -38,12 +39,16 @@ trait MockTwoWayMessageConnector extends BeforeAndAfterEach with MockitoSugar {
 
   val messageContent = "<h>FakePartial</h>"
 
-  val response = HttpResponse(responseStatus = 200, responseString = Some(messageContent))
+  val response = HttpResponse(responseStatus = Status.OK, responseString = Some(messageContent))
 
   val messagePartial: HtmlPartial = HtmlPartial.readsPartial.read("someMethod", "someUrl", response)
 
   def mockSuccessfulMessagePartial(id: String)(hc: HeaderCarrier): Unit = {
     when(mockTwoWayMessageConnector.loadMessagePartial(equalsMock(id))(any[HeaderCarrier])).thenReturn(Future.successful(messagePartial))
+  }
+
+  def mockSuccessfulMessageListSize(id:String)(hc:HeaderCarrier): Unit = {
+    when(mockTwoWayMessageConnector.getMessageListSize(equalsMock(id))(any[HeaderCarrier])).thenReturn(Future.successful(1))
   }
 
   def mockPostMessage(id: String)(hc:HeaderCarrier): Unit = {

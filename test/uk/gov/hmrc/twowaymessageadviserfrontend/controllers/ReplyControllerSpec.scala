@@ -19,20 +19,24 @@ package controllers
 
 import com.google.inject.AbstractModule
 import net.codingwell.scalaguice.ScalaModule
-
+import org.mockito.ArgumentMatchers._
+import org.mockito.Mockito._
 import play.api.Configuration
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.AnyContentAsFormUrlEncoded
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-
 import reactivemongo.bson.BSONObjectID
 import uk.gov.hmrc.auth.core.AuthProvider.PrivilegedApplication
 import uk.gov.hmrc.auth.core._
+import uk.gov.hmrc.auth.core.retrieve.{Name, Retrievals, SimpleRetrieval}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.twowaymessageadviserfrontend.connectors.TwoWayMessageConnector
 import uk.gov.hmrc.twowaymessageadviserfrontend.connectors.mocks.MockAuthConnector
 import uk.gov.hmrc.twowaymessageadviserfrontend.connectors.mocks.MockTwoWayMessageConnector
+import uk.gov.hmrc.twowaymessageadviserfrontend.models.MessageMetadata
+import uk.gov.hmrc.twowaymessageadviserfrontend.services.ReplyService
+
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -40,12 +44,16 @@ class ReplyControllerSpec extends ControllerSpecBase with MockAuthConnector with
 
   private val ID: BSONObjectID = BSONObjectID.parse("5c18eb166f0000110204b160").get
 
+  private val mockReplyService = mock[ReplyService]
+  private val mockMessageMetadata = mock[MessageMetadata]
+
   override val injector = new GuiceApplicationBuilder()
       .configure(Configuration("metrics.enabled" -> false))
     .overrides(new AbstractModule with ScalaModule {
       override def configure(): Unit = {
         bind[AuthConnector].toInstance(mockAuthConnector)
         bind[TwoWayMessageConnector].toInstance(mockTwoWayMessageConnector)
+        bind[ReplyService].toInstance(mockReplyService)
       }
     })
       .injector()
@@ -57,16 +65,18 @@ class ReplyControllerSpec extends ControllerSpecBase with MockAuthConnector with
   "On page load" should {
 
     "Given request to onload when request does not have authorization then expect stride redirect" in {
-      mockAuthorise(AuthProviders(PrivilegedApplication))(Future.failed(UnsupportedAuthProvider()))
+      mockAuthorise(AuthProviders(PrivilegedApplication),Retrievals.name)(Future.failed(UnsupportedAuthProvider()))
       val result = await(call(controller.onPageLoad(ID), fakeRequest))
       result.header.status mustBe 303
       result.header.headers.get("Location") mustBe Some("/stride/sign-in?successURL=http%3A%2F%2F%2F&origin=two-way-message-adviser-frontend")
     }
 
     "Given request to onload when request is authorised, return reply screen with original customer message" in {
-      mockAuthorise(AuthProviders(PrivilegedApplication))(Future.successful(Some("")))
+      mockAuthorise(AuthProviders(PrivilegedApplication),Retrievals.name)(Future.successful(Name(Some("TestUser"),None)))
       mockSuccessfulMetadata(ID.stringify)(hc)
       mockSuccessfulMessagePartial(ID.stringify)(hc)
+      mockSuccessfulMessageListSize(ID.stringify)(hc)
+      when(mockReplyService.getMessageMetadata(any[String])(any[HeaderCarrier])).thenReturn(Future.successful(Some(mockMessageMetadata)))
       val result = call(controller.onPageLoad(ID), fakeRequest)
 
       contentAsString(result) contains "<h1 class=\"heading-large\">Reply to a secure question</h1>"

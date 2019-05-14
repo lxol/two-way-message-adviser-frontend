@@ -14,7 +14,7 @@
  * limitations under the License.
  *@
 
-@(field: Field, label: String, secondaryLabel: Option[String] = None, inputClass: Option[String] = None, labelClass: Option[String] = None, hint: Option[String] = None, identifier: String, content: Option[String])(implicit messages: Messages)
+@(field: Field, label: String, secondaryLabel: Option[String] = None, inputClass: Option[String] = None, labelClass: Option[String] = None, hint: Option[String] = None, identifier: String, content: Option[Html])(implicit messages: Messages)
 
 <div class="form-group @if(field.hasErrors){form-group-error}">
     <label class="form-label" for="@{field.id}">
@@ -27,7 +27,7 @@
         }
     </label>
     <div class="form-control-wrapper char-counter full-width" data-char-counter>
-        <textarea name="@{field.id}" id="@{field.id}" rows="10" cols="80">@{content.getOrElse("")}</textarea>
+        <textarea name="@{field.id}" id="@{field.id}" rows="10" cols="80"></textarea>
         <script>
             CKEDITOR.replace( '@{field.id}', {
                 contentsCss: '@routes.Assets.versioned("stylesheets/editor.css")',
@@ -49,6 +49,7 @@
 	            ],
 	            removeButtons: 'Italic,Underline,Strike,Subscript,Superscript,CopyFormatting,RemoveFormat,Outdent,Indent,CreateDiv,Blockquote,JustifyLeft,JustifyCenter,JustifyRight,JustifyBlock,BidiLtr,BidiRtl,Unlink,Anchor,Language,Source,Save,NewPage,Templates,Preview,Print,Cut,Copy,Paste,PasteText,PasteFromWord,Find,Replace,SelectAll,Form,Checkbox,Radio,TextField,Textarea,Select,Button,ImageButton,HiddenField,Image,Flash,Table,HorizontalRule,Smiley,SpecialChar,PageBreak,Iframe,Styles,Format,Font,FontSize,TextColor,BGColor,ShowBlocks,Maximize,About'
             });
+            CKEDITOR.instances['@{field.id}'].setData('@content.getOrElse(Html(""))');
         </script>
     </div>
 </div>

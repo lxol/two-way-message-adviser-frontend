@@ -25,7 +25,7 @@ import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import uk.gov.hmrc.play.config.ServicesConfig
 import uk.gov.hmrc.play.partials.HtmlPartial
 import uk.gov.hmrc.play.partials.HtmlPartial.connectionExceptionsAsHtmlPartialFailure
-import uk.gov.hmrc.twowaymessageadviserfrontend.models.{EditReplyDetails, ReplyDetails}
+import uk.gov.hmrc.twowaymessageadviserfrontend.models.{EditReplyDetails, MessageMetadata, ReplyDetails}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -43,7 +43,7 @@ class TwoWayMessageConnector @Inject()(httpClient: HttpClient,
     */
   def postMessage(reply: ReplyDetails, replyTo: String)(implicit hc: HeaderCarrier): Future[HttpResponse] = {
     val encodedReply = reply.copy(content = Base64.encodeBase64String(reply.content.getBytes("UTF-8")))
-    httpClient.POST(s"$twoWayMessageBaseUrl/two-way-message/message/advisor/$replyTo/reply", encodedReply)
+    httpClient.POST(s"$twoWayMessageBaseUrl/two-way-message/message/adviser/$replyTo/reply", encodedReply)
   }
 
   /**
@@ -51,7 +51,7 @@ class TwoWayMessageConnector @Inject()(httpClient: HttpClient,
     */
   def postMessage(reply: EditReplyDetails, replyTo: String)(implicit hc: HeaderCarrier): Future[HttpResponse] = {
     val encodedReply = reply.copy(content = Base64.encodeBase64String(reply.getContent.getBytes("UTF-8")))
-    httpClient.POST(s"$twoWayMessageBaseUrl/two-way-message/message/advisor/$replyTo/reply", encodedReply)
+    httpClient.POST(s"$twoWayMessageBaseUrl/two-way-message/message/adviser/$replyTo/reply", encodedReply)
   }
 
   def retrieveRecipientIdentifier(originalMessageId: String)(implicit hc: HeaderCarrier): Future[String] = {
@@ -64,6 +64,15 @@ class TwoWayMessageConnector @Inject()(httpClient: HttpClient,
   def loadMessagePartial(messageId: String)(implicit hc: HeaderCarrier): Future[HtmlPartial] =
     httpClient.GET[HtmlPartial](url(s"/two-way-message/message/adviser/message-content/$messageId"))
       .recover {connectionExceptionsAsHtmlPartialFailure}
+
+  def getMessageMetadata(messageId: String)(implicit hc: HeaderCarrier): Future[HttpResponse] =
+    httpClient.GET(s"$twoWayMessageBaseUrl/two-way-message/message/adviser/recipient-metadata/$messageId")
+
+  def getMessageListSize(messageId: String)(implicit hc: HeaderCarrier): Future[Int] = {
+    httpClient.GET(s"$twoWayMessageBaseUrl/two-way-message/message/messages-list/$messageId/size").map(e => {
+      (Json.parse(e.body)).as[Int]
+    })
+  }
 
   private def url(path: String) = baseUrl("two-way-message") + path
 }

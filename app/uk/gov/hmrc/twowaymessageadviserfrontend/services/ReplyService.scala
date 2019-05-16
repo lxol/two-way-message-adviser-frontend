@@ -56,16 +56,24 @@ class ReplyService @Inject()(override val messagesApi: MessagesApi, twoWayMessag
     */
   def getDefaultText(maybeMetadata: Option[MessageMetadata], threadSize: Int, name: Name): String = {
     val textVersion = getReplyTextVersion(threadSize)
+    val adviserName = getAdviserName(name)
     getReplyInfo(maybeMetadata) match {
       case Some(replyInfo) =>
         s"""${Messages("reply.text.para.1",replyInfo.taxpayerName)}\n
            |${Messages("reply.text.para.2",replyInfo.messageDate)}\n
            |${Messages("reply.text.para.3." + textVersion)}\n
            |${Messages("reply.text.para.4")}\n
-           |${Messages("reply.text.signature.1")}
-           |${getAdviserName(name)}
+           |${getSignatureText(adviserName)}
            |${Messages("reply.text.signature.2")}""".stripMargin.replace("\\'","'")
       case None => ""
+    }
+  }
+
+  def getSignatureText(adviserName: String): String = {
+    if(adviserName != "") {
+      s"${Messages("reply.text.signature.1")}\n$adviserName"
+    } else {
+      s"${Messages("reply.text.signature.1")}"
     }
   }
 

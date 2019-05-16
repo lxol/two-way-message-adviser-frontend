@@ -77,7 +77,6 @@ class ReplyServiceSpec extends WordSpec with Matchers {
       |I believe this answers your question and hope you are satisfied with the response. There's no need to send a reply. But if you think there's something important missing, just ask another question about this below.
       |
       |Regards
-      |
       |HMRC digital team""".stripMargin
       val defaultText = replyService.getDefaultText(Some(metadataWithoutTaxpayerName),threadSize = 1,Name(None,None))
       defaultText shouldBe expectedText

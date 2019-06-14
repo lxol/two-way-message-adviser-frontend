@@ -26,6 +26,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.twowaymessageadviserfrontend.connectors.TwoWayMessageConnector
 import uk.gov.hmrc.twowaymessageadviserfrontend.models.MessageMetadata
 import uk.gov.hmrc.twowaymessageadviserfrontend.models.MessageMetadataFormat._
+import uk.gov.hmrc.twowaymessageadviserfrontend.utils.NameCase
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Random
@@ -59,7 +60,7 @@ class ReplyService @Inject()(override val messagesApi: MessagesApi, twoWayMessag
     val adviserName = getAdviserName(name)
     getReplyInfo(maybeMetadata) match {
       case Some(replyInfo) =>
-        s"""${Messages("reply.text.para.1",replyInfo.taxpayerName)}\n
+        s"""${Messages("reply.text.para.1",NameCase.nc(replyInfo.taxpayerName))}\n
            |${Messages("reply.text.para.2",replyInfo.messageDate)}\n
            |${Messages("reply.text.para.3." + textVersion)}\n
            |${Messages("reply.text.para.4")}\n
@@ -110,7 +111,7 @@ class ReplyService @Inject()(override val messagesApi: MessagesApi, twoWayMessag
   private def getMessagesHtml(replyInfo: ReplyInfo, threadSize: Int, name: Name): NodeBuffer = {
     val textVersion = getReplyTextVersion(threadSize)
     val adviserName = getAdviserName(name)
-    <p>{Messages("reply.text.para.1", replyInfo.taxpayerName)}</p>
+    <p>{Messages("reply.text.para.1", NameCase.nc(replyInfo.taxpayerName))}</p>
       <p>{Messages("reply.text.para.2", replyInfo.messageDate)}</p>
       <p>{Messages("reply.text.para.3." + textVersion)}</p>
       <p>{Messages("reply.text.para.4")}</p>

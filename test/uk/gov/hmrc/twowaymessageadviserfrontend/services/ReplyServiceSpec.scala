@@ -34,7 +34,7 @@ class ReplyServiceSpec extends WordSpec with Matchers {
     TaxEntity("",TaxIdWithName("",""),None),
     "",
     MetadataDetails(None,None,None),
-    Some(TaxpayerName(Some("Mr"),Some("Mickey"),None,Some("Mouse"))),
+    Some(TaxpayerName(Some("mr"),Some("mickey"),None,Some("mouse"))),
     "29th April 2019"
   )
 

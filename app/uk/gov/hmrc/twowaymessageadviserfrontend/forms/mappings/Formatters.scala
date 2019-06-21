@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package forms.mappings
+package uk.gov.hmrc.twowaymessageadviserfrontend.forms.mappings
 
 import play.api.data.FormError
 import play.api.data.format.Formatter
-import models.Enumerable
+import uk.gov.hmrc.twowaymessageadviserfrontend.models.Enumerable
 
 import scala.util.control.Exception.nonFatalCatch
 
@@ -41,7 +41,7 @@ trait Formatters {
 
       private val baseFormatter = stringFormatter(requiredKey)
 
-      override def bind(key: String, data: Map[String, String]) =
+      override def bind(key: String, data: Map[String, String]):Either[Seq[FormError],Boolean] =
         baseFormatter
           .bind(key, data)
           .right.flatMap {
@@ -50,7 +50,7 @@ trait Formatters {
           case _ => Left(Seq(FormError(key, invalidKey)))
         }
 
-      def unbind(key: String, value: Boolean) = Map(key -> value.toString)
+      def unbind(key: String, value: Boolean):Map[String,String] = Map(key -> value.toString)
     }
 
   private[mappings] def intFormatter(requiredKey: String, wholeNumberKey: String, nonNumericKey: String): Formatter[Int] =
@@ -60,7 +60,7 @@ trait Formatters {
 
       private val baseFormatter = stringFormatter(requiredKey)
 
-      override def bind(key: String, data: Map[String, String]) =
+      override def bind(key: String, data: Map[String, String]):Either[Seq[FormError],Int] =
         baseFormatter
           .bind(key, data)
           .right.map(_.replace(",", ""))
@@ -73,7 +73,7 @@ trait Formatters {
               .left.map(_ => Seq(FormError(key, nonNumericKey)))
         }
 
-      override def unbind(key: String, value: Int) =
+      override def unbind(key: String, value: Int): Map[String,String] =
         baseFormatter.unbind(key, value.toString)
     }
 

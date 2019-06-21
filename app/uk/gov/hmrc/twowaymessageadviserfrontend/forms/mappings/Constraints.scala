@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package forms.mappings
+package uk.gov.hmrc.twowaymessageadviserfrontend.forms.mappings
 
 import play.api.data.validation.{Constraint, Invalid, Valid}
 

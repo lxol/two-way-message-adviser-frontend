@@ -14,24 +14,59 @@
  * limitations under the License.
  *@
 
-@import config.FrontendAppConfig
+@import uk.gov.hmrc.twowaymessageadviserfrontend.config.FrontendAppConfig
 @import uk.gov.hmrc.play.views.html._
-@import controllers.routes._
-@import utils.FormHelpers
+@import uk.gov.hmrc.twowaymessageadviserfrontend.controllers.routes._
+@import uk.gov.hmrc.twowaymessageadviserfrontend.utils.FormHelpers
 @import uk.gov.hmrc.play.partials.HtmlPartial
 
-@import utils.InputOption
+@import uk.gov.hmrc.twowaymessageadviserfrontend.utils.InputOption
 
 @import reactivemongo.bson.BSONObjectID
 
 @import play.twirl.api.Html
 
-@(appConfig: FrontendAppConfig, form: Form[_], id: BSONObjectID, identifier: String, content: Option[String], contentPartial: HtmlPartial)(implicit request: Request[_], messages: Messages)
+@(appConfig: FrontendAppConfig, form: Form[_], id: BSONObjectID, customerId: String, content: Option[Html], contentPartial: HtmlPartial)(implicit request: Request[_], messages: Messages)
+
+@scriptElem = {
+    <script type="text/javascript">
+        if (typeof CKEDITOR !== 'undefined') {
+            for (var instanceName in CKEDITOR.instances) {
+                if (typeof CKEDITOR.instances[instanceName] !== 'undefined') {
+                    debugger;
+                    CKEDITOR.instances[instanceName].destroy();
+                }
+            }
+        }
+        CKEDITOR.replace( '@{form("adviser-reply").id}', {
+            contentsCss: '@routes.Assets.versioned("stylesheets/editor.css")',
+            stylesSet: 'gov_uk',
+            toolbarGroups: [
+                { name: 'document', groups: [ 'mode', 'document', 'doctools' ] },
+		        { name: 'editing', groups: [ 'find', 'selection', 'spellchecker', 'editing' ] },
+		        { name: 'forms', groups: [ 'forms' ] },
+		        { name: 'basicstyles', groups: [ 'basicstyles', 'cleanup' ] },
+		        { name: 'paragraph', groups: [ 'list', 'indent', 'blocks', 'align', 'bidi', 'paragraph' ] },
+		        { name: 'links', groups: [ 'links' ] },
+		        { name: 'clipboard', groups: [ 'clipboard', 'undo' ] },
+		        { name: 'insert', groups: [ 'insert' ] },
+		        { name: 'styles', groups: [ 'styles' ] },
+		        { name: 'colors', groups: [ 'colors' ] },
+		        { name: 'tools', groups: [ 'tools' ] },
+		        { name: 'others', groups: [ 'others' ] },
+		        { name: 'about', groups: [ 'about' ] }
+	        ],
+	        removeButtons: 'Italic,Underline,Strike,Subscript,Superscript,CopyFormatting,RemoveFormat,Outdent,Indent,CreateDiv,Blockquote,JustifyLeft,JustifyCenter,JustifyRight,JustifyBlock,BidiLtr,BidiRtl,Unlink,Anchor,Language,Source,Save,NewPage,Templates,Preview,Print,Cut,Copy,Paste,PasteText,PasteFromWord,Find,Replace,SelectAll,Form,Checkbox,Radio,TextField,Textarea,Select,Button,ImageButton,HiddenField,Image,Flash,Table,HorizontalRule,Smiley,SpecialChar,PageBreak,Iframe,Styles,Format,Font,FontSize,TextColor,BGColor,ShowBlocks,Maximize,About'
+        });
+        CKEDITOR.instances['@{form("adviser-reply").id}'].setData('@{content.getOrElse("")}');
+    </script>
+}
 
 @main_template(
     title = messages("reply.title"),
     appConfig = appConfig,
-    bodyClasses = None) {
+    bodyClasses = None,
+    scriptElem = Some(scriptElem)) {
 
     @components.back_link()
 
@@ -40,19 +75,17 @@
     @components.heading(messages("reply.heading"))
 
     @helpers.form(action = ReplyController.onSubmit(id), 'autoComplete -> "off") {
-        <input type="hidden" name='identifier' value="@{identifier}">
+        <input type="hidden" name='identifier' value="@{customerId}">
 
-            @components.input_textarea(
-                field = form("content"),
-                label = messages("reply.label"),
-                identifier = identifier,
-                content = content
-            )
+           @components.input_editor(
+               field = form("adviser-reply"),
+               label = messages("reply.label"),
+               customerId = customerId,
+               content = content
+           )
 
-            @components.submit_button(false)
-
-            @contentPartial.successfulContentOrElse(Html("Sorry, there's been a problem retrieving message content."))
-
+        @components.submit_button()
     }
+    @contentPartial.successfulContentOrElse(Html("Sorry, there's been a problem retrieving message content."))
 
 }

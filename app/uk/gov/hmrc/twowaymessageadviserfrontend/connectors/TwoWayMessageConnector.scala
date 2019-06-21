@@ -25,9 +25,10 @@ import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import uk.gov.hmrc.play.config.ServicesConfig
 import uk.gov.hmrc.play.partials.HtmlPartial
 import uk.gov.hmrc.play.partials.HtmlPartial.connectionExceptionsAsHtmlPartialFailure
-import uk.gov.hmrc.twowaymessageadviserfrontend.models.{EditReplyDetails, MessageMetadata, ReplyDetails}
+import uk.gov.hmrc.twowaymessageadviserfrontend.models.ReplyDetails
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.duration.Duration
 
 class TwoWayMessageConnector @Inject()(httpClient: HttpClient,
                                        override val runModeConfiguration: Configuration,
@@ -39,40 +40,51 @@ class TwoWayMessageConnector @Inject()(httpClient: HttpClient,
   lazy val twoWayMessageBaseUrl: String = baseUrl("two-way-message")
 
   /**
-    *Posts the text content from the adviser reply form to the two-way-message service
-    */
-  def postMessage(reply: ReplyDetails, replyTo: String)(implicit hc: HeaderCarrier): Future[HttpResponse] = {
-    val encodedReply = reply.copy(content = Base64.encodeBase64String(reply.content.getBytes("UTF-8")))
-    httpClient.POST(s"$twoWayMessageBaseUrl/two-way-message/message/adviser/$replyTo/reply", encodedReply)
-  }
-
-  /**
     * Posts the html content from the adviser reply text editor to the two-way-message service
     */
-  def postMessage(reply: EditReplyDetails, replyTo: String)(implicit hc: HeaderCarrier): Future[HttpResponse] = {
+  def postMessage(reply: ReplyDetails, replyTo: String)(implicit hc: HeaderCarrier): Future[HttpResponse] = {
     val encodedReply = reply.copy(content = Base64.encodeBase64String(reply.getContent.getBytes("UTF-8")))
     httpClient.POST(s"$twoWayMessageBaseUrl/two-way-message/message/adviser/$replyTo/reply", encodedReply)
   }
 
-  def retrieveRecipientIdentifier(originalMessageId: String)(implicit hc: HeaderCarrier): Future[String] = {
+  /**
+    * Gets the customer identifier for a specific message as a string from the two-way-message service
+    */
+  def getCustomerIdentifier(originalMessageId: String)(implicit hc: HeaderCarrier): Future[String] = {
     httpClient.GET[HttpResponse](s"$twoWayMessageBaseUrl/two-way-message/message/adviser/recipient-metadata/$originalMessageId")
       .map(e => {
         (Json.parse(e.body) \ "recipient" \ "identifier" \ "value").as[String]
       })
   }
 
-  def loadMessagePartial(messageId: String)(implicit hc: HeaderCarrier): Future[HtmlPartial] =
+  /**
+    * Gets an HTML fragment rendering a single message by message ID from the two-way-message service
+    */
+  def getMessagePartial(messageId: String)(implicit hc: HeaderCarrier): Future[HtmlPartial] =
     httpClient.GET[HtmlPartial](url(s"/two-way-message/message/adviser/message-content/$messageId"))
       .recover {connectionExceptionsAsHtmlPartialFailure}
 
+  /**
+    * Gets the message metadata for a single message as JSON from the two-way-message service
+    */
   def getMessageMetadata(messageId: String)(implicit hc: HeaderCarrier): Future[HttpResponse] =
     httpClient.GET(s"$twoWayMessageBaseUrl/two-way-message/message/adviser/recipient-metadata/$messageId")
 
+  /**
+    * Gets the integer value of the number of messages in a conversation history from the two-way-message service
+    */
   def getMessageListSize(messageId: String)(implicit hc: HeaderCarrier): Future[Int] = {
     httpClient.GET(s"$twoWayMessageBaseUrl/two-way-message/message/messages-list/$messageId/size").map(e => {
-      (Json.parse(e.body)).as[Int]
+      Json.parse(e.body).as[Int]
     })
   }
 
-  private def url(path: String) = baseUrl("two-way-message") + path
+  /**
+    * Gets an HTML fragment rendering a message conversation history by the latest message ID from the two-way-message service
+    */
+  def getConversationPartial(messageId: String)(implicit hc: HeaderCarrier): Future[HtmlPartial] =
+    httpClient.GET[HtmlPartial](s"$twoWayMessageBaseUrl/messages/$messageId/adviser-content")
+    .recover {connectionExceptionsAsHtmlPartialFailure}
+
+  private def url(path: String): String = baseUrl("two-way-message") + path
 }

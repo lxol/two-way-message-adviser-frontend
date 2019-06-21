@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package utils
+package uk.gov.hmrc.twowaymessageadviserfrontend.utils
 
 import play.api.data.Form
 
 object FormHelpers {
 
-  def getErrorByKey[A](form: Form[_], errorKey: String) = {
+  def getErrorByKey[A](form: Form[_], errorKey: String): String = {
     form.error(errorKey) match {
       case None => ""
       case Some(error) => error.message

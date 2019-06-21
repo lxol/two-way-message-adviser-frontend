@@ -43,7 +43,7 @@ class ReplyService @Inject()(override val messagesApi: MessagesApi, twoWayMessag
     * Retrieve the message metadata
     */
   def getMessageMetadata(messageId: String)(implicit hc: HeaderCarrier): Future[Option[MessageMetadata]] = {
-    twoWayMessageConnector.getMessageMetadata(messageId).flatMap(  response =>
+    twoWayMessageConnector.getMessageMetadata(messageId).flatMap( response =>
       response.status match {
         case OK =>
           val metadata = Json.parse(response.body).validate[MessageMetadata]

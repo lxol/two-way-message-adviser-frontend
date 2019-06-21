@@ -17,9 +17,7 @@
 package uk.gov.hmrc.twowaymessageadviserfrontend.controllers.util
 
 import javax.inject.Inject
-
-import play.api.mvc.AnyContent
-import play.api.mvc.Request
+import play.api.mvc.{AnyContent, Request, Result}
 import play.api.{Configuration, Environment}
 import uk.gov.hmrc.play.bootstrap.config.AuthRedirects
 
@@ -27,9 +25,9 @@ import scala.concurrent.Future
 
 class StrideUtil @Inject()(val env: Environment, val config: Configuration) extends AuthRedirects{
 
-  def redirectToStrideLogin()(implicit request: Request[AnyContent]) = {
-    config.getBoolean("includeHostInRedirect") match {
-      case Some(true) => Future.successful(toStrideLogin( s"http://${request.host}${request.uri}"))
+  def redirectToStrideLogin()(implicit request: Request[AnyContent]): Future[Result] = {
+    config.getBoolean(path = "includeHostInRedirect") match {
+      case Some(true) => Future.successful(toStrideLogin( successUrl = s"http://${request.host}${request.uri}"))
       case _ => Future.successful(toStrideLogin(request.uri))
     }
   }

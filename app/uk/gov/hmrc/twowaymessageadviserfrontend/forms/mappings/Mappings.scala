@@ -14,16 +14,13 @@
  * limitations under the License.
  */
 
-package forms.mappings
+package uk.gov.hmrc.twowaymessageadviserfrontend.forms.mappings
 
 import play.api.data.FieldMapping
 import play.api.data.Forms.of
-import models.Enumerable
+import uk.gov.hmrc.twowaymessageadviserfrontend.models.Enumerable
 
 trait Mappings extends Formatters with Constraints {
-
-  protected def text(errorKey: String = "error.required"): FieldMapping[String] =
-    of(stringFormatter(errorKey))
 
   protected def int(requiredKey: String = "error.required",
                     wholeNumberKey: String = "error.wholeNumber",

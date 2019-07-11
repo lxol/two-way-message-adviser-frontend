@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 
-package utils
+package uk.gov.hmrc.twowaymessageadviserfrontend.utils
 
 case class InputOption(value: String, label: String, dataTarget: Option[String] = None)

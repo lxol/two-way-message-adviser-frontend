@@ -25,7 +25,7 @@ lazy val root = (project in file("."))
     ScoverageKeys.coverageFailOnMinimum := false,
     ScoverageKeys.coverageHighlighting := true,
     scalacOptions ++= Seq("-Xfatal-warnings", "-feature"),
-    routesImport += "uk.gov.hmrc.message.controllers.binders.Binders._",
+    routesImport += "uk.gov.hmrc.twowaymessageadviserfrontend.controllers.binders.Binders._",
     libraryDependencies              ++= AppDependencies.compile ++ AppDependencies.test,
 
     retrieveManaged := true,

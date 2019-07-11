@@ -14,16 +14,15 @@
  * limitations under the License.
  */
 
-package controllers
+package uk.gov.hmrc.twowaymessageadviserfrontend.controllers
 
 import play.api.Configuration
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import reactivemongo.bson.BSONObjectID
+import uk.gov.hmrc.twowaymessageadviserfrontend.base.SpecBase
 
-import scala.concurrent.ExecutionContext.Implicits.global
-
-class ReplyFeedbackSuccessControllerSpec extends ControllerSpecBase {
+class ReplyFeedbackSuccessControllerSpec extends SpecBase {
 
   override val injector = new GuiceApplicationBuilder()
     .configure(Configuration("metrics.enabled" -> false))

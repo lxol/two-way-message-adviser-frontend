@@ -26,16 +26,11 @@ import scala.xml._
 import scala.xml.parsing.XhtmlParser
 import scala.xml.transform.RewriteRule
 
-case class ReplyDetails(content: String)
 
-object ReplyDetails {
-  implicit val format: OFormat[ReplyDetails] = Json.format[ReplyDetails]
-}
-
-case class EditReplyDetails(content: String) {
+case class ReplyDetails(private val content: String) {
 
   private def stringToXhtml(string: String): Try[Seq[Node]] = {
-    val xhtmlString = s"<html>$string</html>"
+    val xhtmlString = s"<html>$string</html>".replaceAll("[\n\r]","").replaceAll("&nbsp;"," ")
     try {
       val parser = new XhtmlParser(Source.fromString(xhtmlString))
       val doc = parser.initialize.document()
@@ -76,6 +71,6 @@ case class EditReplyDetails(content: String) {
   }
 }
 
-object EditReplyDetails {
-  implicit val format: OFormat[EditReplyDetails] = Json.format[EditReplyDetails]
+object ReplyDetails {
+  implicit val format: OFormat[ReplyDetails] = Json.format[ReplyDetails]
 }

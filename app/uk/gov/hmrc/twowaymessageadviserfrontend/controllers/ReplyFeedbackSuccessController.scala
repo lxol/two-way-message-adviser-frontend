@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-package controllers
+package uk.gov.hmrc.twowaymessageadviserfrontend.controllers
 
-import config.FrontendAppConfig
 import javax.inject.Inject
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.Action
+import play.api.mvc.{Action, AnyContent}
 import reactivemongo.bson.BSONObjectID
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
+import uk.gov.hmrc.twowaymessageadviserfrontend.config.FrontendAppConfig
 import uk.gov.hmrc.twowaymessageadviserfrontend.views
 
 class ReplyFeedbackSuccessController @Inject()(appConfig: FrontendAppConfig,
                                          override val messagesApi: MessagesApi) extends FrontendController with I18nSupport {
 
-  def onPageLoad(id: BSONObjectID) = Action {
+  def onPageLoad(id: BSONObjectID): Action[AnyContent] = Action {
     implicit request =>
       Ok(views.html.replyFeedbackSuccess(appConfig, id))
   }

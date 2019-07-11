@@ -46,7 +46,7 @@ case class TaxpayerName(title: Option[String] = None, forename: Option[String] =
                         Option[String] = None, line1: Option[String] = None, line2: Option[String] = None,
                         line3: Option[String] = None ) {
 
-  override def toString(): String =
+  override def toString: String =
     s"""${title.getOrElse("")} ${forename.getOrElse("")} ${surname.getOrElse("")}"""
 }
 

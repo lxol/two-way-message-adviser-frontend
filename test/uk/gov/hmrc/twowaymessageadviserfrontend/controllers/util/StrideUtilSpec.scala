@@ -16,12 +16,10 @@
 
 package uk.gov.hmrc.twowaymessageadviserfrontend.controllers.util
 
-import base.SpecBase
 import play.api.Configuration
 import play.api.inject.guice.GuiceApplicationBuilder
-
-import scala.concurrent.ExecutionContext.Implicits.global
 import play.api.test.Helpers._
+import uk.gov.hmrc.twowaymessageadviserfrontend.base.SpecBase
 
 class StrideUtilSpec extends SpecBase {
 

@@ -17,18 +17,18 @@
 package uk.gov.hmrc.twowaymessageadviserfrontend.controllers
 
 import com.google.inject.AbstractModule
-import controllers.{ControllerSpecBase, IndexController}
 import net.codingwell.scalaguice.ScalaModule
 import play.api.Configuration
 import play.api.inject.guice.GuiceApplicationBuilder
-import uk.gov.hmrc.auth.core.AuthProvider.PrivilegedApplication
-import uk.gov.hmrc.auth.core.{AuthConnector, AuthProviders, UnsupportedAuthProvider}
-import uk.gov.hmrc.twowaymessageadviserfrontend.connectors.mocks.MockAuthConnector
 import play.api.test.Helpers._
+import uk.gov.hmrc.auth.core.{AuthConnector, AuthProviders, UnsupportedAuthProvider}
+import uk.gov.hmrc.auth.core.AuthProvider.PrivilegedApplication
+import uk.gov.hmrc.twowaymessageadviserfrontend.base.SpecBase
+import uk.gov.hmrc.twowaymessageadviserfrontend.connectors.mocks.MockAuthConnector
 
 import scala.concurrent.Future
 
-class IndexControllerSpec extends ControllerSpecBase with MockAuthConnector {
+class IndexControllerSpec extends SpecBase with MockAuthConnector {
 
   override val injector = new GuiceApplicationBuilder()
     .configure(Configuration("metrics.enabled" -> false))

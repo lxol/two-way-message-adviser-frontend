@@ -27,7 +27,7 @@ class ReplyDetailsSpec extends WordSpec with Matchers {
   "ReplyFormProvider.getContent" should {
 
     "add list classes to " in {
-      val reply = EditReplyDetails(exampleInput)
+      val reply = ReplyDetails(exampleInput)
       reply.getContent shouldEqual expectedOutput
     }
 

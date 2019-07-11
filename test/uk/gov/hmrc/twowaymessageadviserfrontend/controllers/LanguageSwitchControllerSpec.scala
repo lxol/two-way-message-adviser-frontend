@@ -17,13 +17,12 @@
 package uk.gov.hmrc.twowaymessageadviserfrontend.controllers
 
 
-import base.SpecBase
-import controllers.LanguageSwitchController
 import play.api.Configuration
-import play.api.test.Helpers._
 import play.api.test.FakeRequest
+import play.api.test.Helpers._
+import uk.gov.hmrc.twowaymessageadviserfrontend.base.SpecBase
 
-class LanguageSwitchControllerSpec extends SpecBase  {
+class LanguageSwitchControllerSpec extends SpecBase {
 
   val config =  Configuration.empty
 

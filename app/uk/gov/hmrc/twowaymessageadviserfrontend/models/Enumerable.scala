@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package models
+package uk.gov.hmrc.twowaymessageadviserfrontend.models
 
 import play.api.libs.json._
 

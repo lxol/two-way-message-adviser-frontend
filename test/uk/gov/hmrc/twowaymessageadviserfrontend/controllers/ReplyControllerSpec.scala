@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers
+package uk.gov.hmrc.twowaymessageadviserfrontend.controllers
 
 
 import com.google.inject.AbstractModule
@@ -27,20 +27,19 @@ import play.api.mvc.AnyContentAsFormUrlEncoded
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import reactivemongo.bson.BSONObjectID
-import uk.gov.hmrc.auth.core.AuthProvider.PrivilegedApplication
 import uk.gov.hmrc.auth.core._
-import uk.gov.hmrc.auth.core.retrieve.{Name, Retrievals, SimpleRetrieval}
+import uk.gov.hmrc.auth.core.AuthProvider.PrivilegedApplication
+import uk.gov.hmrc.auth.core.retrieve.{Name, Retrievals}
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.twowaymessageadviserfrontend.base.SpecBase
 import uk.gov.hmrc.twowaymessageadviserfrontend.connectors.TwoWayMessageConnector
-import uk.gov.hmrc.twowaymessageadviserfrontend.connectors.mocks.MockAuthConnector
-import uk.gov.hmrc.twowaymessageadviserfrontend.connectors.mocks.MockTwoWayMessageConnector
+import uk.gov.hmrc.twowaymessageadviserfrontend.connectors.mocks.{MockAuthConnector, MockTwoWayMessageConnector}
 import uk.gov.hmrc.twowaymessageadviserfrontend.models.MessageMetadata
 import uk.gov.hmrc.twowaymessageadviserfrontend.services.ReplyService
 
 import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
 
-class ReplyControllerSpec extends ControllerSpecBase with MockAuthConnector with MockTwoWayMessageConnector {
+class ReplyControllerSpec extends SpecBase with MockAuthConnector with MockTwoWayMessageConnector {
 
   private val ID: BSONObjectID = BSONObjectID.parse("5c18eb166f0000110204b160").get
 
@@ -74,13 +73,13 @@ class ReplyControllerSpec extends ControllerSpecBase with MockAuthConnector with
     "Given request to onload when request is authorised, return reply screen with original customer message" in {
       mockAuthorise(AuthProviders(PrivilegedApplication),Retrievals.name)(Future.successful(Name(Some("TestUser"),None)))
       mockSuccessfulMetadata(ID.stringify)(hc)
-      mockSuccessfulMessagePartial(ID.stringify)(hc)
+      mockSuccessfulConversationPartial(ID.stringify)(hc)
       mockSuccessfulMessageListSize(ID.stringify)(hc)
       when(mockReplyService.getMessageMetadata(any[String])(any[HeaderCarrier])).thenReturn(Future.successful(Some(mockMessageMetadata)))
       val result = call(controller.onPageLoad(ID), fakeRequest)
 
       contentAsString(result) contains "<h1 class=\"heading-large\">Reply to a secure question</h1>"
-      contentAsString(result) contains s"${messagePartial}"
+      contentAsString(result) contains s"$messagePartial"
     }
   }
 
@@ -95,7 +94,7 @@ class ReplyControllerSpec extends ControllerSpecBase with MockAuthConnector with
     "Given authorised request with well formed form - then expect success" in {
       val goodRequestWithFormData: FakeRequest[AnyContentAsFormUrlEncoded] =
         fakeReplyRequest
-          .withFormUrlEncodedBody("content" -> "content " * 50, "identifier" -> "P800")
+          .withFormUrlEncodedBody("adviser-reply" -> "content " * 50, "identifier" -> "P800")
       mockSuccessfulMessagePartial(ID.stringify)(hc)
       mockAuthorise(AuthProviders(PrivilegedApplication))(Future.successful(Some("")))
       mockPostMessage(ID.stringify)(hc)
@@ -111,7 +110,7 @@ class ReplyControllerSpec extends ControllerSpecBase with MockAuthConnector with
         fakeReplyRequest
           .withFormUrlEncodedBody("adviser-reply" -> "not enough content", "identifier" -> "p800")
       mockAuthorise(AuthProviders(PrivilegedApplication))(Future.successful(Some("")))
-      mockSuccessfulMessagePartial(ID.stringify)(hc)
+      mockSuccessfulConversationPartial(ID.stringify)(hc)
       mockPostMessage(ID.stringify)(hc)
 
       val result = call(controller.onSubmit(ID), badRequestWithFormData)

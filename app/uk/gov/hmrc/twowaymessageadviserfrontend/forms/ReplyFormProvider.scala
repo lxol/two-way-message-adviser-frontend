@@ -14,20 +14,24 @@
  * limitations under the License.
  */
 
-package forms
+package uk.gov.hmrc.twowaymessageadviserfrontend.forms
 
-import forms.mappings.Mappings
 import javax.inject.Inject
 import play.api.data.Form
 import play.api.data.Forms._
+import uk.gov.hmrc.twowaymessageadviserfrontend.forms.mappings.Mappings
 import uk.gov.hmrc.twowaymessageadviserfrontend.models.ReplyDetails
 
-class ReplyFormProvider @Inject() extends FormErrorHelper with Mappings {
+class ReplyFormProvider @Inject() extends Mappings {
 
-  def apply(): Form[ReplyDetails] = Form(
-    mapping(
-      "content" -> nonEmptyText(minLength = 100)
-    )(ReplyDetails.apply)(ReplyDetails.unapply)
-  )
+  val minimumReplyCharacters = 100
+
+  def apply(): Form[ReplyDetails] =
+    Form(
+      mapping(
+        "adviser-reply" -> text(minLength = minimumReplyCharacters)
+      )(ReplyDetails.apply)(ReplyDetails.unapply).verifying("Invalid content entered. Please try again removing any unusual characters or symbols.", reply =>
+        reply.validate(reply.getContent))
+    )
 
 }

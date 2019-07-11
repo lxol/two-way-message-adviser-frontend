@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.message.controllers.binders
+package uk.gov.hmrc.twowaymessageadviserfrontend.controllers.binders
 
 import play.api.mvc.{PathBindable, QueryStringBindable}
 import reactivemongo.bson.BSONObjectID
@@ -23,7 +23,7 @@ import scala.util.{Failure, Success}
 
 object Binders {
 
-  implicit val BSONObjectIdBinder = new QueryStringBindable[BSONObjectID] {
+  implicit val BSONObjectIdBinder: QueryStringBindable[BSONObjectID] = new QueryStringBindable[BSONObjectID] {
     def bind(key: String, params: Map[String, Seq[String]]): Option[Either[String, BSONObjectID]] =
       params.get(key).flatMap(_.headOption).map(value => BSONObjectID.parse(value) match {
         case Success(boid) => Some(Right(boid))

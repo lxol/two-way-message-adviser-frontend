@@ -14,22 +14,20 @@
  * limitations under the License.
  */
 
-package controllers
+package uk.gov.hmrc.twowaymessageadviserfrontend.controllers
 
 import com.google.inject.Inject
-import config.FrontendAppConfig
 import play.api.Configuration
 import play.api.i18n.{I18nSupport, Lang, MessagesApi}
-import play.api.mvc.{Action, AnyContent, Call, Controller}
+import play.api.mvc.{Action, AnyContent, Controller}
 import uk.gov.hmrc.play.language.LanguageUtils
+import uk.gov.hmrc.twowaymessageadviserfrontend.config.FrontendAppConfig
 
 class LanguageSwitchController @Inject() (
                                            configuration: Configuration,
                                            appConfig: FrontendAppConfig,
                                            implicit val messagesApi: MessagesApi
                                          ) extends Controller with I18nSupport {
-
-  private def langToCall(lang: String): (String) => Call = appConfig.routeToSwitchLanguage
 
   private def fallbackURL: String = routes.IndexController.onPageLoad().url
 

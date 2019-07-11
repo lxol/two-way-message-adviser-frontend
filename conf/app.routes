@@ -1,13 +1,12 @@
 # microservice specific routes
 
-GET        /                             controllers.IndexController.onPageLoad
+GET        /                             uk.gov.hmrc.twowaymessageadviserfrontend.controllers.IndexController.onPageLoad
 GET        /assets/*file                 controllers.Assets.versioned(path="/public", file: Asset)
 
-GET        /message/:id/reply            controllers.ReplyController.onPageLoad(id: reactivemongo.bson.BSONObjectID)
-GET        /message/:id/reply-edit       controllers.ReplyController.onPageLoadEdit(id: reactivemongo.bson.BSONObjectID)
-POST       /message/submit               controllers.ReplyController.onSubmit(id: reactivemongo.bson.BSONObjectID)
-GET        /message/submitted            controllers.ReplyFeedbackSuccessController.onPageLoad(id: reactivemongo.bson.BSONObjectID )
+GET        /message/:id/reply            uk.gov.hmrc.twowaymessageadviserfrontend.controllers.ReplyController.onPageLoad(id: reactivemongo.bson.BSONObjectID)
+POST       /message/submit               uk.gov.hmrc.twowaymessageadviserfrontend.controllers.ReplyController.onSubmit(id: reactivemongo.bson.BSONObjectID)
+GET        /message/submitted            uk.gov.hmrc.twowaymessageadviserfrontend.controllers.ReplyFeedbackSuccessController.onPageLoad(id: reactivemongo.bson.BSONObjectID)
 
-GET        /language/:lang               controllers.LanguageSwitchController.switchToLanguage(lang: String)
+GET        /language/:lang               uk.gov.hmrc.twowaymessageadviserfrontend.controllers.LanguageSwitchController.switchToLanguage(lang: String)
 
-GET        /javascriptRoutes             controllers.ReplyController.javascriptRoutes
+GET        /javascriptRoutes             controllers.JavascriptController.javascriptRoutes

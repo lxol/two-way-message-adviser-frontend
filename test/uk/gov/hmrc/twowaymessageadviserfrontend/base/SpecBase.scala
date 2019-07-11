@@ -14,28 +14,27 @@
  * limitations under the License.
  */
 
-package base
+package uk.gov.hmrc.twowaymessageadviserfrontend.base
 
 import akka.actor.ActorSystem
 import akka.stream.Materializer
-import config.FrontendAppConfig
-import forms.ReplyFormProvider
 import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice._
 import play.api.i18n.{Messages, MessagesApi}
 import play.api.inject.Injector
-import play.api.libs.concurrent.ActorSystemProvider
-import play.api.mvc.{AnyContentAsEmpty, Results}
+import play.api.mvc.{AnyContentAsEmpty, Request, Results}
 import play.api.test.FakeRequest
+import uk.gov.hmrc.twowaymessageadviserfrontend.config.FrontendAppConfig
+import uk.gov.hmrc.twowaymessageadviserfrontend.forms.ReplyFormProvider
 
 trait SpecBase extends PlaySpec with Results with GuiceOneAppPerSuite with MockitoSugar {
 
   def injector: Injector = app.injector
   def frontendAppConfig: FrontendAppConfig = injector.instanceOf[FrontendAppConfig]
   def messagesApi: MessagesApi = injector.instanceOf[MessagesApi]
-  def getRequest = FakeRequest("GET", "/")
-  def postRequest = FakeRequest("POST", "/")
+  def getRequest: Request[_] = FakeRequest("GET", "/")
+  def postRequest: Request[_] = FakeRequest("POST", "/")
   def formProvider: ReplyFormProvider = injector.instanceOf[ReplyFormProvider]
   def messages: Messages = messagesApi.preferred(fakeRequest)
 

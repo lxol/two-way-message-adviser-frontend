@@ -14,36 +14,19 @@
  * limitations under the License.
  *@
 
-@import reactivemongo.bson.BSONObjectID
-
-@(
-        field: Field,
-        label: String,
-        id: BSONObjectID,
-        inputClass: Option[String] = None,
-        hint: Option[String] = None,
-        labelClass: Option[String] = None
-)(implicit messages: Messages)
+@(field: Field, label: String, secondaryLabel: Option[String] = None, inputClass: Option[String] = None, labelClass: Option[String] = None, hint: Option[String] = None, customerId: String, content: Option[Html])(implicit messages: Messages)
 
 <div class="form-group @if(field.hasErrors){form-group-error}">
     <label class="form-label" for="@{field.id}">
-        <span class="bold @if(labelClass.nonEmpty){@labelClass}">@label</span>
-        @if(hint.nonEmpty){
+        <span class="bold @labelClass">Reply to latest message from @{customerId}</span>
+        @hint.map { hint =>
             <span class="form-hint">@hint</span>
         }
         @field.errors.map { error =>
             <span class="error-message" id="error-message-@{field.id}-input">@messages(error.message, error.args: _*)</span>
         }
     </label>
-    <div class="form-control-wrapper">
-        <input
-        class="form-control @inputClass"
-        type="text"
-        id="@{field.id}"
-        name="@{field.name}"
-        value="@{field.value}"
-            @if(field.hasErrors){aria-describedby="error-message-@{field.id}-input"}
-        />
+    <div class="form-control-wrapper full-width">
+        <textarea name="@{field.id}" id="@{field.id}" rows="10" cols="80"></textarea>
     </div>
 </div>
-

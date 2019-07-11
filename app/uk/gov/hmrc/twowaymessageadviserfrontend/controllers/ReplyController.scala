@@ -14,68 +14,51 @@
  * limitations under the License.
  */
 
-package controllers
+package uk.gov.hmrc.twowaymessageadviserfrontend.controllers
 
-import config.FrontendAppConfig
-import forms.ReplyFormProvider
 import javax.inject.Inject
 import play.api.{Configuration, Environment, Logger}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent}
-import play.api.routing.JavaScriptReverseRouter
+import play.twirl.api.Html
 import reactivemongo.bson.BSONObjectID
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.AuthProvider.PrivilegedApplication
 import uk.gov.hmrc.auth.core.retrieve.Retrievals
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
+import uk.gov.hmrc.twowaymessageadviserfrontend.config.FrontendAppConfig
 import uk.gov.hmrc.twowaymessageadviserfrontend.connectors.TwoWayMessageConnector
 import uk.gov.hmrc.twowaymessageadviserfrontend.controllers.util.StrideUtil
-import uk.gov.hmrc.twowaymessageadviserfrontend.forms.EditReplyFormProvider
-import uk.gov.hmrc.twowaymessageadviserfrontend.models.{EditReplyDetails, MessageMetadata, ReplyDetails, TaxpayerName}
+import uk.gov.hmrc.twowaymessageadviserfrontend.forms.ReplyFormProvider
+import uk.gov.hmrc.twowaymessageadviserfrontend.models.ReplyDetails
 import uk.gov.hmrc.twowaymessageadviserfrontend.services.ReplyService
 import uk.gov.hmrc.twowaymessageadviserfrontend.views
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 class ReplyController @Inject()(appConfig: FrontendAppConfig,
-  override val messagesApi: MessagesApi,
-  formProvider: ReplyFormProvider,
-  editFormProvider: EditReplyFormProvider,
-  val config: Configuration,
-  val env: Environment,
-  val authConnector: AuthConnector,
-  val strideUtil: StrideUtil,
-  val twoWayMessageConnector: TwoWayMessageConnector,
-  val replyService: ReplyService)(implicit ec:ExecutionContext) extends FrontendController with I18nSupport with AuthorisedFunctions {
+                                override val messagesApi: MessagesApi,
+                                formProvider: ReplyFormProvider,
+                                val config: Configuration,
+                                val env: Environment,
+                                val authConnector: AuthConnector,
+                                val strideUtil: StrideUtil,
+                                val twoWayMessageConnector: TwoWayMessageConnector,
+                                val replyService: ReplyService)(implicit ec:ExecutionContext)
+  extends FrontendController with I18nSupport with AuthorisedFunctions {
 
   val form: Form[ReplyDetails] = formProvider()
-  val editForm: Form[EditReplyDetails] = editFormProvider()
 
   def onPageLoad(id: BSONObjectID): Action[AnyContent] = Action.async {
     implicit request =>
       authorised(AuthProviders(PrivilegedApplication)).retrieve(Retrievals.name) { name =>
         for {
-          identifier <- twoWayMessageConnector.retrieveRecipientIdentifier(id.stringify)
-          partial <- twoWayMessageConnector.loadMessagePartial(id.stringify)
+          customerId <- twoWayMessageConnector.getCustomerIdentifier(id.stringify)
+          partial <- twoWayMessageConnector.getConversationPartial(id.stringify)
           threadSize <- twoWayMessageConnector.getMessageListSize(id.stringify)
-          metadataResult <- replyService.getMessageMetadata(id.stringify)
-        } yield ( Ok(views.html.reply(appConfig, form, id, identifier, Some(replyService.getDefaultText(metadataResult,threadSize,name)), partial)))
-      }.recoverWith {
-        case _: NoActiveSession => strideUtil.redirectToStrideLogin()
-        case _: UnsupportedAuthProvider => strideUtil.redirectToStrideLogin()
-      }
-  }
-
-  def onPageLoadEdit(id: BSONObjectID): Action[AnyContent] = Action.async {
-    implicit request =>
-      authorised(AuthProviders(PrivilegedApplication)).retrieve(Retrievals.name) { name =>
-        for {
-          identifier <- twoWayMessageConnector.retrieveRecipientIdentifier(id.stringify)
-          partial <- twoWayMessageConnector.loadMessagePartial(id.stringify)
-          threadSize <- twoWayMessageConnector.getMessageListSize(id.stringify)
-          metadataResult <- replyService.getMessageMetadata(id.stringify)
-        } yield (Ok(views.html.reply_edit(appConfig, editForm, id, identifier, Some(replyService.getDefaultHtml(metadataResult, threadSize, name)), partial)))
+          messageMetadata <- replyService.getMessageMetadata(id.stringify)
+        } yield Ok(views.html.reply(appConfig, form, id, customerId, Some(replyService.getDefaultHtml(messageMetadata, threadSize, name)), partial)).withHeaders(CACHE_CONTROL -> "no-cache")
       }.recoverWith {
         case _: NoActiveSession => strideUtil.redirectToStrideLogin()
         case _: UnsupportedAuthProvider => strideUtil.redirectToStrideLogin()
@@ -88,15 +71,15 @@ class ReplyController @Inject()(appConfig: FrontendAppConfig,
       form.bindFromRequest().fold(
         (formWithErrors: Form[_]) =>
             for {
-                partial <- twoWayMessageConnector.loadMessagePartial(id.stringify)
+                partial <- twoWayMessageConnector.getConversationPartial(id.stringify)
             } yield { BadRequest( views.html.reply(
                             appConfig, formWithErrors, id,
-                            formWithErrors.data.get("identifier").get,
-                            formWithErrors.data.get("content"), partial))},
-        (replyDetails) => {
-          Logger.debug(s"replyDetails: ${replyDetails}")
-          twoWayMessageConnector.postMessage(replyDetails, id.stringify).map {
-            case _  => Redirect(routes.ReplyFeedbackSuccessController.onPageLoad(id))
+                            formWithErrors.data("identifier"),
+                            Some(Html(formWithErrors.data("adviser-reply").replaceAll("[\n\r]",""))), partial))},
+        replyDetails => {
+          Logger.debug(s"replyDetails: $replyDetails")
+          twoWayMessageConnector.postMessage(replyDetails, id.stringify).map {_=>
+            Redirect(routes.ReplyFeedbackSuccessController.onPageLoad(id))
           }
         }
       )
@@ -106,15 +89,4 @@ class ReplyController @Inject()(appConfig: FrontendAppConfig,
       }
   }
 
-  def javascriptRoutes: Action[AnyContent] = Action.async {
-    implicit request =>
-      authorised(AuthProviders(PrivilegedApplication)) {
-        Future.successful(Ok(JavaScriptReverseRouter("jsRoutes")(
-          routes.javascript.Assets.versioned
-        )).as("text/javascript"))
-      }.recoverWith {
-        case _: NoActiveSession => strideUtil.redirectToStrideLogin()
-        case _: UnsupportedAuthProvider => strideUtil.redirectToStrideLogin()
-      }
-  }
 }

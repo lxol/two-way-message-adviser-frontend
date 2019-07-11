@@ -17,14 +17,13 @@
 package config
 
 import javax.inject.{Inject, Singleton}
-import play.api.Logger
 import play.api.i18n.{Messages, MessagesApi}
 import play.api.mvc.{Request, RequestHeader, Result}
 import play.api.mvc.Results.{InternalServerError, NotFound}
 import play.twirl.api.Html
-import uk.gov.hmrc.auth.core.{AuthorisationException, BearerTokenExpired, MissingBearerToken, NoActiveSession}
 import uk.gov.hmrc.http.{NotFoundException, Upstream5xxResponse}
 import uk.gov.hmrc.play.bootstrap.http.FrontendErrorHandler
+import uk.gov.hmrc.twowaymessageadviserfrontend.config.FrontendAppConfig
 import uk.gov.hmrc.twowaymessageadviserfrontend.views
 
 @Singleton

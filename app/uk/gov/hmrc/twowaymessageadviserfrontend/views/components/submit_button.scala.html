@@ -14,12 +14,8 @@
  * limitations under the License.
  *@
 
-@(buttonDisabled: Boolean)(implicit messages: Messages)
+@()(implicit messages: Messages)
 
 <div class="section">
- @if(buttonDisabled) {
-    <button id="submit" class="button" disabled="disabled">@messages("site.continue")</button>
- } else {
     <button id="submit" class="button">@messages("site.continue")</button>
- }
 </div>

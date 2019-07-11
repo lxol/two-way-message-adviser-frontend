@@ -24,7 +24,7 @@ import play.api.http.Status
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.partials.HtmlPartial
 import uk.gov.hmrc.twowaymessageadviserfrontend.connectors.TwoWayMessageConnector
-import uk.gov.hmrc.twowaymessageadviserfrontend.models.{EditReplyDetails, ReplyDetails}
+import uk.gov.hmrc.twowaymessageadviserfrontend.models.ReplyDetails
 
 import scala.concurrent.Future
 
@@ -34,7 +34,7 @@ trait MockTwoWayMessageConnector extends BeforeAndAfterEach with MockitoSugar {
   val mockTwoWayMessageConnector: TwoWayMessageConnector = mock[TwoWayMessageConnector]
 
   def mockSuccessfulMetadata(id: String)(hc: HeaderCarrier): Unit = {
-    when(mockTwoWayMessageConnector.retrieveRecipientIdentifier(equalsMock(id))(any[HeaderCarrier])).thenReturn(Future.successful("AB123450"))
+    when(mockTwoWayMessageConnector.getCustomerIdentifier(equalsMock(id))(any[HeaderCarrier])).thenReturn(Future.successful("AB123450"))
   }
 
   val messageContent = "<h>FakePartial</h>"
@@ -44,7 +44,11 @@ trait MockTwoWayMessageConnector extends BeforeAndAfterEach with MockitoSugar {
   val messagePartial: HtmlPartial = HtmlPartial.readsPartial.read("someMethod", "someUrl", response)
 
   def mockSuccessfulMessagePartial(id: String)(hc: HeaderCarrier): Unit = {
-    when(mockTwoWayMessageConnector.loadMessagePartial(equalsMock(id))(any[HeaderCarrier])).thenReturn(Future.successful(messagePartial))
+    when(mockTwoWayMessageConnector.getMessagePartial(equalsMock(id))(any[HeaderCarrier])).thenReturn(Future.successful(messagePartial))
+  }
+
+  def mockSuccessfulConversationPartial(id: String)(hc: HeaderCarrier): Unit = {
+    when(mockTwoWayMessageConnector.getConversationPartial(equalsMock(id))(any[HeaderCarrier])).thenReturn(Future.successful(messagePartial))
   }
 
   def mockSuccessfulMessageListSize(id:String)(hc:HeaderCarrier): Unit = {
@@ -56,7 +60,7 @@ trait MockTwoWayMessageConnector extends BeforeAndAfterEach with MockitoSugar {
       .thenReturn(Future.successful(mock[HttpResponse]))
   }
 
-  def mock(replyDetails: EditReplyDetails, id: String): Unit = {
+  def mock(replyDetails: ReplyDetails, id: String): Unit = {
     ()
   }
 

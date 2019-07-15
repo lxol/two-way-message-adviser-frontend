@@ -38,6 +38,15 @@ class ReplyServiceSpec extends WordSpec with Matchers {
     "29th April 2019"
   )
 
+  private val metadataWithPaddedTaxpayerName = MessageMetadata(
+    "",
+    TaxEntity("",TaxIdWithName("",""),None),
+    "",
+    MetadataDetails(None,None,None),
+    Some(TaxpayerName(Some(" mr "),Some(" mickey    "),None,Some("  mouse  "))),
+    "29th April 2019"
+  )
+
   private val metadataWithoutTaxpayerName = MessageMetadata(
     "",
     TaxEntity("",TaxIdWithName("",""),None),
@@ -46,43 +55,6 @@ class ReplyServiceSpec extends WordSpec with Matchers {
     Some(TaxpayerName()),
     "29th April 2019"
   )
-
-  "ReplyService.getDefaultText" should {
-
-    "return auto-filled text" in {
-
-      val expectedText = """Dear Mr Mickey Mouse
-      |
-      |Thank you for your message of 29th April 2019.
-      |
-      |To recap your question, I think you're asking for help with
-      |
-      |I believe this answers your question and hope you are satisfied with the response. There's no need to send a reply. But if you think there's something important missing, just ask another question about this below.
-      |
-      |Regards
-      |Minnie Mouse
-      |HMRC digital team""".stripMargin
-      val defaultText = replyService.getDefaultText(Some(metadataWithTaxpayerName), threadSize = 1,Name(Some("Minnie"),Some("Mouse")))
-      defaultText shouldBe expectedText
-    }
-
-    "return text with default values" in {
-
-      val expectedText = """Dear Customer
-      |
-      |Thank you for your message of 29th April 2019.
-      |
-      |To recap your question, I think you're asking for help with
-      |
-      |I believe this answers your question and hope you are satisfied with the response. There's no need to send a reply. But if you think there's something important missing, just ask another question about this below.
-      |
-      |Regards
-      |HMRC digital team""".stripMargin
-      val defaultText = replyService.getDefaultText(Some(metadataWithoutTaxpayerName),threadSize = 1,Name(None,None))
-      defaultText shouldBe expectedText
-    }
-    SharedMetricRegistries.clear()
-  }
 
   "ReplyService.getDefaultHtml" should {
 
@@ -98,6 +70,9 @@ class ReplyServiceSpec extends WordSpec with Matchers {
       val defaultHtml = replyService.getDefaultHtml(Some(metadataWithTaxpayerName), threadSize = 1,Name(Some("Minnie"),Some("Mouse")))
       defaultHtml shouldBe expectedHtml
 
+      val defaultHtml2 = replyService.getDefaultHtml(Some(metadataWithPaddedTaxpayerName), threadSize = 1,Name(Some("Minnie"),Some("Mouse")))
+      defaultHtml2 shouldBe expectedHtml
+
     }
 
     "return HTML with default values" in {
@@ -112,6 +87,9 @@ class ReplyServiceSpec extends WordSpec with Matchers {
       val defaultHtml = replyService.getDefaultHtml(Some(metadataWithoutTaxpayerName),threadSize = 1,Name(None,None))
       defaultHtml shouldBe expectedHtml
     }
+
+    SharedMetricRegistries.clear()
+
   }
 
 }

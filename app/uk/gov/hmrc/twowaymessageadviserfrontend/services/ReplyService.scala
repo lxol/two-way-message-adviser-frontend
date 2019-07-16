@@ -53,32 +53,6 @@ class ReplyService @Inject()(override val messagesApi: MessagesApi, twoWayMessag
   }
 
   /**
-    * Get the default text with inserted values to pre-populate the adviser reply message
-    */
-  def getDefaultText(maybeMetadata: Option[MessageMetadata], threadSize: Int, name: Name): String = {
-    val textVersion = getReplyTextVersion(threadSize)
-    val adviserName = getAdviserName(name)
-    getReplyInfo(maybeMetadata) match {
-      case Some(replyInfo) =>
-        s"""${Messages("reply.text.para.1",NameCase.nc(replyInfo.taxpayerName))}\n
-           |${Messages("reply.text.para.2",replyInfo.messageDate)}\n
-           |${Messages("reply.text.para.3." + textVersion)}\n
-           |${Messages("reply.text.para.4")}\n
-           |${getSignatureText(adviserName)}
-           |${Messages("reply.text.signature.2")}""".stripMargin.replace("\\'","'")
-      case None => ""
-    }
-  }
-
-  def getSignatureText(adviserName: String): String = {
-    if(adviserName != "") {
-      s"${Messages("reply.text.signature.1")}\n$adviserName"
-    } else {
-      s"${Messages("reply.text.signature.1")}"
-    }
-  }
-
-  /**
     * Get the default HTML with inserted values to pre-populate the adviser's reply
     */
   def getDefaultHtml(maybeMetadata: Option[MessageMetadata], threadSize: Int, name: Name): Html = {
@@ -108,10 +82,15 @@ class ReplyService @Inject()(override val messagesApi: MessagesApi, twoWayMessag
     (firstName + " " + lastName).trim
   }
 
+  private def getTaxpayerName(replyInfo: ReplyInfo): String = {
+    val taxpayerName = NameCase.nc(replyInfo.taxpayerName)
+    taxpayerName.trim().replaceAll("\\s+"," ")
+  }
+
   private def getMessagesHtml(replyInfo: ReplyInfo, threadSize: Int, name: Name): NodeBuffer = {
     val textVersion = getReplyTextVersion(threadSize)
     val adviserName = getAdviserName(name)
-    <p>{Messages("reply.text.para.1", NameCase.nc(replyInfo.taxpayerName))}</p>
+    <p>{Messages("reply.text.para.1", getTaxpayerName(replyInfo))}</p>
       <p>{Messages("reply.text.para.2", replyInfo.messageDate)}</p>
       <p>{Messages("reply.text.para.3." + textVersion)}</p>
       <p>{Messages("reply.text.para.4")}</p>

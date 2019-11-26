@@ -43,7 +43,7 @@ reply.text.para.3.2 = I\''ve been looking into your question about
 reply.text.para.3.3 = As I understand it, you\''re looking for help with
 reply.text.para.4 = I believe this answers your question and hope you are satisfied with the response. There\''s no need to send a reply. But if you think there\''s something important missing, just ask another question about this below.
 reply.text.signature.1 = Regards
-reply.text.signature.2 = HMRC digital team
+reply.text.signature.2 = HMRC Digital Team
 
 unauthorised.title = You can’t access this service with this account
 unauthorised.heading = You can’t access this service with this account

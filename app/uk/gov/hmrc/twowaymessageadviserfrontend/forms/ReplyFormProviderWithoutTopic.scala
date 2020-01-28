@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,18 +20,18 @@ import javax.inject.Inject
 import play.api.data.Form
 import play.api.data.Forms._
 import uk.gov.hmrc.twowaymessageadviserfrontend.forms.mappings.Mappings
-import uk.gov.hmrc.twowaymessageadviserfrontend.models.ReplyDetails
+import uk.gov.hmrc.twowaymessageadviserfrontend.models.{ReplyDetails, ReplyDetailsOptionalTopic}
 
-class ReplyFormProvider @Inject() extends Mappings {
+class ReplyFormProviderWithoutTopic @Inject() extends Mappings {
 
   val minimumReplyCharacters = 100
 
-  def apply(): Form[ReplyDetails] =
+  def apply(): Form[ReplyDetailsOptionalTopic] =
     Form(
       mapping(
-        "adviser-reply" -> text(minLength = minimumReplyCharacters)
-      )(ReplyDetails.apply)(ReplyDetails.unapply).verifying("Invalid content entered. Please try again removing any unusual characters or symbols.", reply =>
+        "adviser-reply" -> text(minLength = minimumReplyCharacters),
+        "topic"         -> optional(text)
+      )(ReplyDetailsOptionalTopic.apply)(ReplyDetailsOptionalTopic.unapply).verifying("Invalid content entered. Please try again removing any unusual characters or symbols.", reply =>
         reply.validate(reply.getContent))
     )
-
 }

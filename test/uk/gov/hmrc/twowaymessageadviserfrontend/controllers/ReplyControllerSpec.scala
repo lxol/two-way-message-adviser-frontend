@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,6 +42,7 @@ import scala.concurrent.Future
 class ReplyControllerSpec extends SpecBase with MockAuthConnector with MockTwoWayMessageConnector {
 
   private val ID: BSONObjectID = BSONObjectID.parse("5c18eb166f0000110204b160").get
+  private val threadSize: Int = 1
 
   private val mockReplyService = mock[ReplyService]
   private val mockMessageMetadata = mock[MessageMetadata]
@@ -59,7 +60,7 @@ class ReplyControllerSpec extends SpecBase with MockAuthConnector with MockTwoWa
 
   implicit val hc: HeaderCarrier = mock[HeaderCarrier]
   val controller = injector.instanceOf[ReplyController]
-  val fakeReplyRequest = FakeRequest(routes.ReplyController.onSubmit(ID))
+  val fakeReplyRequest = FakeRequest(routes.ReplyController.onSubmit(ID, threadSize))
 
   "On page load" should {
 
@@ -86,20 +87,20 @@ class ReplyControllerSpec extends SpecBase with MockAuthConnector with MockTwoWa
   "On submit" should {
     "Given request to submit when request does not have authorization then expect stride redirect" in {
       mockAuthorise(AuthProviders(PrivilegedApplication))(Future.failed(UnsupportedAuthProvider()))
-      val result = await(call(controller.onSubmit(ID), fakeRequest))
+      val result = await(call(controller.onSubmit(ID, threadSize), fakeRequest))
       result.header.status mustBe 303
       result.header.headers.get("Location") mustBe Some("/stride/sign-in?successURL=http%3A%2F%2F%2F&origin=two-way-message-adviser-frontend")
     }
 
     "Given authorised request with well formed form - then expect success" in {
       val goodRequestWithFormData: FakeRequest[AnyContentAsFormUrlEncoded] =
-        fakeReplyRequest
-          .withFormUrlEncodedBody("adviser-reply" -> "content " * 50, "identifier" -> "P800")
+      fakeReplyRequest
+        .withFormUrlEncodedBody("adviser-reply" -> "content " * 50, "identifier" -> "P800", "topic" -> "topic")
       mockSuccessfulMessagePartial(ID.stringify)(hc)
       mockAuthorise(AuthProviders(PrivilegedApplication))(Future.successful(Some("")))
       mockPostMessage(ID.stringify)(hc)
 
-      val result = await(call(controller.onSubmit(ID), goodRequestWithFormData))
+      val result = await(call(controller.onSubmit(ID, threadSize), goodRequestWithFormData))
       result.header.status mustBe 303
       result.header.headers.get("Location") mustBe Some(s"/two-way-message-adviser-frontend/message/submitted?id=${ID.stringify}")
 
@@ -111,9 +112,10 @@ class ReplyControllerSpec extends SpecBase with MockAuthConnector with MockTwoWa
           .withFormUrlEncodedBody("adviser-reply" -> "not enough content", "identifier" -> "p800")
       mockAuthorise(AuthProviders(PrivilegedApplication))(Future.successful(Some("")))
       mockSuccessfulConversationPartial(ID.stringify)(hc)
+      mockSuccessfulMessageListSize(ID.stringify)(hc)
       mockPostMessage(ID.stringify)(hc)
 
-      val result = call(controller.onSubmit(ID), badRequestWithFormData)
+      val result = call(controller.onSubmit(ID, threadSize), badRequestWithFormData)
       contentAsString(result) contains "<a href=\"#content\">Minimum length is 100</a>"
       contentAsString(result) contains s"${messagePartial}"
     }

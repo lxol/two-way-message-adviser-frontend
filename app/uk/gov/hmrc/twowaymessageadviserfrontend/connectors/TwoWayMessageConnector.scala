@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import uk.gov.hmrc.play.config.ServicesConfig
 import uk.gov.hmrc.play.partials.HtmlPartial
 import uk.gov.hmrc.play.partials.HtmlPartial.connectionExceptionsAsHtmlPartialFailure
-import uk.gov.hmrc.twowaymessageadviserfrontend.models.ReplyDetails
+import uk.gov.hmrc.twowaymessageadviserfrontend.models.{ReplyDetails, ReplyDetailsOptionalTopic}
 
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.concurrent.duration.Duration
@@ -42,7 +42,7 @@ class TwoWayMessageConnector @Inject()(httpClient: HttpClient,
   /**
     * Posts the html content from the adviser reply text editor to the two-way-message service
     */
-  def postMessage(reply: ReplyDetails, replyTo: String)(implicit hc: HeaderCarrier): Future[HttpResponse] = {
+  def postMessage(reply: ReplyDetailsOptionalTopic, replyTo: String)(implicit hc: HeaderCarrier): Future[HttpResponse] = {
     val encodedReply = reply.copy(content = Base64.encodeBase64String(reply.getContent.getBytes("UTF-8")))
     httpClient.POST(s"$twoWayMessageBaseUrl/two-way-message/message/adviser/$replyTo/reply", encodedReply)
   }

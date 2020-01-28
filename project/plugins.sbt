@@ -32,4 +32,6 @@ addSbtPlugin("org.scoverage" % "sbt-scoverage" % "1.5.0")
 
 addSbtPlugin("com.github.cb372" % "sbt-explicit-dependencies" % "0.2.9")
 
+addSbtPlugin("uk.gov.hmrc" % "sbt-service-manager" % "0.4.0")
+
 

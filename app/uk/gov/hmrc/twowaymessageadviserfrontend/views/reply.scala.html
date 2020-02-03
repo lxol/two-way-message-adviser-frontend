@@ -87,7 +87,7 @@
     @contentPartial.successfulContentOrElse(Html("Sorry, there's been a problem retrieving message content."))
 
     @if(messagesCount <= 1) {
-      @components.topic_catagories(
+      @components.topic_categories(
         field = form("topic")
       )
     }

@@ -74,9 +74,9 @@ class ReplyController @Inject()(appConfig: FrontendAppConfig,
     implicit request =>
       authorised(AuthProviders(PrivilegedApplication)) {
         if(threadCount > 1) {
-          formWithoutTopic(id, threadCount)
+          subsequentMessage(id, threadCount)
         } else {
-          formWithTopic(id, threadCount)
+          firstMessage(id, threadCount)
         }
       }.recoverWith {
         case _: NoActiveSession => strideUtil.redirectToStrideLogin()
@@ -84,7 +84,7 @@ class ReplyController @Inject()(appConfig: FrontendAppConfig,
       }
   }
 
-  private def formWithoutTopic(id: BSONObjectID, threadCount: Int)(implicit request: Request[_]): Future[Result] = {
+  private def subsequentMessage(id: BSONObjectID, threadCount: Int)(implicit request: Request[_]): Future[Result] = {
     form.bindFromRequest().fold(
       (formWithErrors: Form[_]) =>
         for {
@@ -104,7 +104,7 @@ class ReplyController @Inject()(appConfig: FrontendAppConfig,
     )
   }
 
-  private def formWithTopic(id: BSONObjectID, threadCount: Int)(implicit request: Request[_]): Future[Result] = {
+  private def firstMessage(id: BSONObjectID, threadCount: Int)(implicit request: Request[_]): Future[Result] = {
     formWithTopic.bindFromRequest().fold(
       (formWithErrors: Form[_]) =>
         for {

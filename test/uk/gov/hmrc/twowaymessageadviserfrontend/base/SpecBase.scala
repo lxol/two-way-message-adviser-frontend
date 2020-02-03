@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import play.api.inject.Injector
 import play.api.mvc.{AnyContentAsEmpty, Request, Results}
 import play.api.test.FakeRequest
 import uk.gov.hmrc.twowaymessageadviserfrontend.config.FrontendAppConfig
-import uk.gov.hmrc.twowaymessageadviserfrontend.forms.ReplyFormProvider
+import uk.gov.hmrc.twowaymessageadviserfrontend.forms.ReplyFormProviderWithoutTopic
 
 trait SpecBase extends PlaySpec with Results with GuiceOneAppPerSuite with MockitoSugar {
 
@@ -35,7 +35,7 @@ trait SpecBase extends PlaySpec with Results with GuiceOneAppPerSuite with Mocki
   def messagesApi: MessagesApi = injector.instanceOf[MessagesApi]
   def getRequest: Request[_] = FakeRequest("GET", "/")
   def postRequest: Request[_] = FakeRequest("POST", "/")
-  def formProvider: ReplyFormProvider = injector.instanceOf[ReplyFormProvider]
+  def formProvider: ReplyFormProviderWithoutTopic = injector.instanceOf[ReplyFormProviderWithoutTopic]
   def messages: Messages = messagesApi.preferred(fakeRequest)
 
   implicit lazy val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()

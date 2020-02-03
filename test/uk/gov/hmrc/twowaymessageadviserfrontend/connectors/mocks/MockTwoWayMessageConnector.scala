@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import play.api.http.Status
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.partials.HtmlPartial
 import uk.gov.hmrc.twowaymessageadviserfrontend.connectors.TwoWayMessageConnector
-import uk.gov.hmrc.twowaymessageadviserfrontend.models.ReplyDetails
+import uk.gov.hmrc.twowaymessageadviserfrontend.models.{ReplyDetails, ReplyDetailsOptionalTopic}
 
 import scala.concurrent.Future
 
@@ -56,7 +56,7 @@ trait MockTwoWayMessageConnector extends BeforeAndAfterEach with MockitoSugar {
   }
 
   def mockPostMessage(id: String)(hc:HeaderCarrier): Unit = {
-    when(mockTwoWayMessageConnector.postMessage(any[ReplyDetails], equalsMock(id))(any[HeaderCarrier]))
+    when(mockTwoWayMessageConnector.postMessage(any[ReplyDetailsOptionalTopic], equalsMock(id))(any[HeaderCarrier]))
       .thenReturn(Future.successful(mock[HttpResponse]))
   }
 

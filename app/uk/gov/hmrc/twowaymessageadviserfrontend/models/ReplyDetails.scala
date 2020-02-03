@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,11 +26,10 @@ import scala.xml._
 import scala.xml.parsing.XhtmlParser
 import scala.xml.transform.RewriteRule
 
-
-case class ReplyDetails(private val content: String) {
+trait ReplyDetails {
 
   private def stringToXhtml(string: String): Try[Seq[Node]] = {
-    val xhtmlString = s"<html>$string</html>".replaceAll("[\n\r]","").replaceAll("&nbsp;"," ")
+    val xhtmlString = s"<html>$string</html>".replaceAll("[\n\r]", "").replaceAll("&nbsp;", " ")
     try {
       val parser = new XhtmlParser(Source.fromString(xhtmlString))
       val doc = parser.initialize.document()
@@ -42,10 +41,10 @@ case class ReplyDetails(private val content: String) {
 
   private val addListClass = new RewriteRule {
     override def transform(n: Node): Seq[Node] = n match {
-      case elem: Elem if elem.label == "ol"  =>
-        elem.copy(attributes = new UnprefixedAttribute("class","list list-number",Null), child = elem.child)
+      case elem: Elem if elem.label == "ol" =>
+        elem.copy(attributes = new UnprefixedAttribute("class", "list list-number", Null), child = elem.child)
       case elem: Elem if elem.label == "ul" =>
-        elem.copy(attributes = new UnprefixedAttribute("class","list list-bullet",Null), child = elem.child)
+        elem.copy(attributes = new UnprefixedAttribute("class", "list list-bullet", Null), child = elem.child)
       case `n` => n
     }
   }
@@ -54,7 +53,7 @@ case class ReplyDetails(private val content: String) {
     nodes.flatMap(node => addListClass(node))
   }
 
-  def getContent: String = {
+  protected def getContent(content: String): String = {
     stringToXhtml(content) match {
       case Success(nodes) => updateLists(nodes).mkString
       case Failure(e) =>
@@ -71,6 +70,15 @@ case class ReplyDetails(private val content: String) {
   }
 }
 
-object ReplyDetails {
-  implicit val format: OFormat[ReplyDetails] = Json.format[ReplyDetails]
+case class ReplyDetailsWithTopic(private val content: String, topic: String) extends ReplyDetails {
+  def getContent: String = getContent(content)
+}
+
+case class ReplyDetailsOptionalTopic(private val content: String, topic: Option[String]) extends ReplyDetails {
+  def getContent: String = getContent(content)
+}
+
+
+object ReplyDetailsOptionalTopic {
+  implicit val format: OFormat[ReplyDetailsOptionalTopic] = Json.format[ReplyDetailsOptionalTopic]
 }

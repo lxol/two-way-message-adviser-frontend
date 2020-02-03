@@ -14,15 +14,13 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.twowaymessageadviserfrontend.config.FrontendAppConfig
-@(pageTitle: String, heading: String, message: String)(implicit request: Request[_], messages: Messages, appConfig: FrontendAppConfig)
-
-@contentHeader = {
-  <h1>@heading</h1>
-}
-
-@mainContent = {
-  <p>@message</p>
-}
-
-@govuk_wrapper(appConfig = appConfig, title = pageTitle, contentHeader = Some(contentHeader), mainContent = mainContent)
+@(field: Field)(implicit messages: Messages)
+<h2 class="heading-medium">@messages("topic.h2")</h2>
+<div class="form-group @if(field.hasErrors){form-group-error}">
+ @field.errors.map { error =>
+  <span class="error-message" id="error-message-@{field.id}-input">@messages(error.message, error.args: _*)</span>
+ }
+ @underpaid_topic_type()
+ @overpaid_topic_type()
+ @other_topic_type()
+</div>

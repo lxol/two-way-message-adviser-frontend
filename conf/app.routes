@@ -4,7 +4,7 @@ GET        /                             uk.gov.hmrc.twowaymessageadviserfronten
 GET        /assets/*file                 controllers.Assets.versioned(path="/public", file: Asset)
 
 GET        /message/:id/reply            uk.gov.hmrc.twowaymessageadviserfrontend.controllers.ReplyController.onPageLoad(id: reactivemongo.bson.BSONObjectID)
-POST       /message/submit               uk.gov.hmrc.twowaymessageadviserfrontend.controllers.ReplyController.onSubmit(id: reactivemongo.bson.BSONObjectID)
+POST       /message/submit               uk.gov.hmrc.twowaymessageadviserfrontend.controllers.ReplyController.onSubmit(id: reactivemongo.bson.BSONObjectID, threadCount: Int)
 GET        /message/submitted            uk.gov.hmrc.twowaymessageadviserfrontend.controllers.ReplyFeedbackSuccessController.onPageLoad(id: reactivemongo.bson.BSONObjectID)
 
 GET        /language/:lang               uk.gov.hmrc.twowaymessageadviserfrontend.controllers.LanguageSwitchController.switchToLanguage(lang: String)

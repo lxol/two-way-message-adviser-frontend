@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,13 +24,20 @@ class ReplyDetailsSpec extends WordSpec with Matchers {
 
   val expectedOutput = <p>test</p><ul class="list list-bullet"><li>test</li><li>test</li></ul><p>test</p><ol class="list list-number"><li>test</li><li>test</li></ol>.mkString
 
+  val topic: String = "some-topic"
+
   "ReplyFormProvider.getContent" should {
 
-    "add list classes to " in {
-      val reply = ReplyDetails(exampleInput)
+    "add list classes to" in {
+      val reply = ReplyDetailsOptionalTopic(exampleInput, None)
       reply.getContent shouldEqual expectedOutput
     }
-
   }
 
+  "ReplyForProvider which contains a topic" should {
+    "creation of a reply including a topic" in {
+      val reply = ReplyDetailsOptionalTopic(exampleInput, Some(topic))
+      reply.topic.get shouldEqual topic
+    }
+  }
 }

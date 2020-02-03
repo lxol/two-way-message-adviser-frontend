@@ -65,14 +65,14 @@ class ReplyControllerSpec extends SpecBase with MockAuthConnector with MockTwoWa
   "On page load" should {
 
     "Given request to onload when request does not have authorization then expect stride redirect" in {
-      mockAuthorise(AuthProviders(PrivilegedApplication),Retrievals.name)(Future.failed(UnsupportedAuthProvider()))
+      mockAuthorise(AuthProviders(PrivilegedApplication), Retrievals.name)(Future.failed(UnsupportedAuthProvider()))
       val result = await(call(controller.onPageLoad(ID), fakeRequest))
       result.header.status mustBe 303
       result.header.headers.get("Location") mustBe Some("/stride/sign-in?successURL=http%3A%2F%2F%2F&origin=two-way-message-adviser-frontend")
     }
 
     "Given request to onload when request is authorised, return reply screen with original customer message" in {
-      mockAuthorise(AuthProviders(PrivilegedApplication),Retrievals.name)(Future.successful(Name(Some("TestUser"),None)))
+      mockAuthorise(AuthProviders(PrivilegedApplication), Retrievals.name)(Future.successful(Name(Some("TestUser"), None)))
       mockSuccessfulMetadata(ID.stringify)(hc)
       mockSuccessfulConversationPartial(ID.stringify)(hc)
       mockSuccessfulMessageListSize(ID.stringify)(hc)
@@ -81,6 +81,31 @@ class ReplyControllerSpec extends SpecBase with MockAuthConnector with MockTwoWa
 
       contentAsString(result) contains "<h1 class=\"heading-large\">Reply to a secure question</h1>"
       contentAsString(result) contains s"$messagePartial"
+    }
+
+    "include link to view the first message" in {
+      mockAuthorise(AuthProviders(PrivilegedApplication), Retrievals.name)(Future.successful(Name(Some("TestUser"), None)))
+      mockSuccessfulMetadata(ID.stringify)(hc)
+      mockSuccessfulConversationPartial(ID.stringify)(hc)
+      mockSuccessfulMessageListSize(ID.stringify)(hc)
+      when(mockTwoWayMessageConnector.getMessageListSize(any())(any[HeaderCarrier])).thenReturn(Future.successful(1))
+      when(mockReplyService.getMessageMetadata(any[String])(any[HeaderCarrier])).thenReturn(Future.successful(Some(mockMessageMetadata)))
+      val result = call(controller.onPageLoad(ID), fakeRequest)
+
+      contentAsString(result) contains ("View 1 previous message")
+    }
+
+
+    "include link to view multiple messages" in {
+      mockAuthorise(AuthProviders(PrivilegedApplication), Retrievals.name)(Future.successful(Name(Some("TestUser"), None)))
+      mockSuccessfulMetadata(ID.stringify)(hc)
+      mockSuccessfulConversationPartial(ID.stringify)(hc)
+      mockSuccessfulMessageListSize(ID.stringify)(hc)
+      when(mockTwoWayMessageConnector.getMessageListSize(any())(any[HeaderCarrier])).thenReturn(Future.successful(5))
+      when(mockReplyService.getMessageMetadata(any[String])(any[HeaderCarrier])).thenReturn(Future.successful(Some(mockMessageMetadata)))
+      val result = call(controller.onPageLoad(ID), fakeRequest)
+
+      contentAsString(result) must include ("View 5 previous messages")
     }
   }
 
@@ -114,10 +139,10 @@ class ReplyControllerSpec extends SpecBase with MockAuthConnector with MockTwoWa
       mockSuccessfulConversationPartial(ID.stringify)(hc)
       mockSuccessfulMessageListSize(ID.stringify)(hc)
       mockPostMessage(ID.stringify)(hc)
-
       val result = call(controller.onSubmit(ID, threadSize), badRequestWithFormData)
       contentAsString(result) contains "<a href=\"#content\">Minimum length is 100</a>"
       contentAsString(result) contains s"${messagePartial}"
+      contentAsString(result) must include ("View 1 previous message")
     }
   }
 }

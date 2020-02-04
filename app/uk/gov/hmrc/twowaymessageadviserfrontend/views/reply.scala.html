@@ -26,7 +26,7 @@
 
 @import play.twirl.api.Html
 
-@(appConfig: FrontendAppConfig, form: Form[_], id: BSONObjectID, customerId: String, content: Option[Html], contentPartial: HtmlPartial, messagesCount: Int)(implicit request: Request[_], messages: Messages)
+@(appConfig: FrontendAppConfig, form: Form[_], id: BSONObjectID, customerId: String, content: Option[Html], contentPartial: HtmlPartial, messagesCount: Int, messagesLink: String)(implicit request: Request[_], messages: Messages)
 
 @scriptElem = {
   <script type="text/javascript">
@@ -84,14 +84,17 @@
       content = content
     )
 
-    @contentPartial.successfulContentOrElse(Html("Sorry, there's been a problem retrieving message content."))
-
+<details>
+    <summary>@messagesLink</summary>
+    <div class=""><a href="#" target="_blank" rel="noopener noreferrer"></a>
+        @contentPartial.successfulContentOrElse(Html("Sorry, there's been a problem retrieving message content."))
+    </div>
+</details>
     @if(messagesCount <= 1) {
       @components.topic_categories(
         field = form("topic")
       )
     }
-
     @components.submit_button()
   }
 }

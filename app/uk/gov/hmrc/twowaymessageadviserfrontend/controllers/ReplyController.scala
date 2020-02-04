@@ -17,28 +17,24 @@
 package uk.gov.hmrc.twowaymessageadviserfrontend.controllers
 
 import com.google.inject.Inject
-
-import scala.concurrent.Future
-import play.api.{Configuration, Environment, Logger}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Request, Result}
+import play.api.{Configuration, Environment, Logger}
 import play.twirl.api.Html
 import reactivemongo.bson.BSONObjectID
-import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.AuthProvider.PrivilegedApplication
+import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.retrieve.Retrievals
-import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import uk.gov.hmrc.twowaymessageadviserfrontend.config.FrontendAppConfig
 import uk.gov.hmrc.twowaymessageadviserfrontend.connectors.TwoWayMessageConnector
 import uk.gov.hmrc.twowaymessageadviserfrontend.controllers.util.StrideUtil
 import uk.gov.hmrc.twowaymessageadviserfrontend.forms.{ReplyFormProviderWithoutTopic, ReplyFormWithTopicProvider}
-import uk.gov.hmrc.twowaymessageadviserfrontend.models.{ReplyDetails, ReplyDetailsOptionalTopic, ReplyDetailsWithTopic}
+import uk.gov.hmrc.twowaymessageadviserfrontend.models.{ReplyDetailsOptionalTopic, ReplyDetailsWithTopic}
 import uk.gov.hmrc.twowaymessageadviserfrontend.services.ReplyService
 import uk.gov.hmrc.twowaymessageadviserfrontend.views
-
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class ReplyController @Inject()(appConfig: FrontendAppConfig,
                                 override val messagesApi: MessagesApi,
@@ -63,7 +59,7 @@ class ReplyController @Inject()(appConfig: FrontendAppConfig,
           partial <- twoWayMessageConnector.getConversationPartial(id.stringify)
           threadSize <- twoWayMessageConnector.getMessageListSize(id.stringify)
           messageMetadata <- replyService.getMessageMetadata(id.stringify)
-        } yield Ok(views.html.reply(appConfig, form, id, customerId, Some(replyService.getDefaultHtml(messageMetadata, threadSize, name)), partial, threadSize)).withHeaders(CACHE_CONTROL -> "no-cache")
+        } yield Ok(views.html.reply(appConfig, form, id, customerId, Some(replyService.getDefaultHtml(messageMetadata, threadSize, name)), partial, threadSize, messagesLinkText(threadSize))).withHeaders(CACHE_CONTROL -> "no-cache")
       }.recoverWith {
         case _: NoActiveSession => strideUtil.redirectToStrideLogin()
         case _: UnsupportedAuthProvider => strideUtil.redirectToStrideLogin()
@@ -93,7 +89,7 @@ class ReplyController @Inject()(appConfig: FrontendAppConfig,
           BadRequest(views.html.reply(
             appConfig, formWithErrors, id,
             formWithErrors.data("identifier"),
-            Some(Html(formWithErrors.data("adviser-reply").replaceAll("[\n\r]", ""))), partial, threadCount))
+            Some(Html(formWithErrors.data("adviser-reply").replaceAll("[\n\r]", ""))), partial, threadCount, messagesLinkText(threadCount)))
         },
       replyDetails => {
         Logger.debug(s"replyDetails: $replyDetails")
@@ -112,7 +108,7 @@ class ReplyController @Inject()(appConfig: FrontendAppConfig,
         } yield { BadRequest(views.html.reply(
           appConfig, formWithErrors, id,
           formWithErrors.data("identifier"),
-          Some(Html(formWithErrors.data("adviser-reply").replaceAll("[\n\r]",""))), partial, threadCount))},
+          Some(Html(formWithErrors.data("adviser-reply").replaceAll("[\n\r]",""))), partial, threadCount, messagesLinkText(threadCount)))},
       replyDetailsWithTopic => {
         Logger.debug(s"replyDetails: $replyDetailsWithTopic")
         twoWayMessageConnector.postMessage(ReplyDetailsOptionalTopic(replyDetailsWithTopic.getContent,
@@ -122,4 +118,10 @@ class ReplyController @Inject()(appConfig: FrontendAppConfig,
       }
     )
   }
+
+  private def messagesLinkText(count: Int) =
+    if (count == 1)
+      s"View $count previous message"
+    else
+      s"View $count previous messages"
 }

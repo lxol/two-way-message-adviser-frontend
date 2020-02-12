@@ -2,7 +2,7 @@ date.day = Day
 date.month = Month
 date.year = Year
 
-error.required = Please enter a value
+error.required = Select a topic for your reply
 error.summary.title = There is a problem
 error.topic = Please select a category
 
@@ -53,8 +53,8 @@ topic.h2 = What is the topic of this reply
 
 underpayment.h3            = Underpaid
 underpayment.answer.one    = I need to let you know my underpaid P800 is wrong
-underpayment.answer.two    = I don’t understand my underpaid P800
-underpayment.answer.three  = I don’t understand my underpaid PA302
+underpayment.answer.two    = I do not understand my underpaid P800
+underpayment.answer.three  = I do not understand my underpaid PA302
 underpayment.answer.four   = Can I have a calculation
 underpayment.answer.five   = My PA302 simple assessment is incorrect
 underpayment.answer.six    = I want to appeal/query my PA302 simple assessment
@@ -67,10 +67,10 @@ underpayment.answer.eleven = How do I pay a PAYE underpayment on PTA
 overpayment.h3           = Overpaid
 overpayment.answer.one   = Can I claim a PAYE Repayment
 overpayment.answer.two   = I want to claim a PAYE payable order
-overpayment.answer.three = What’s happening with my PAYE repayment?
+overpayment.answer.three = What has happening with my PAYE repayment?
 overpayment.answer.four  = Can I have my employment history (inc pay and tax)?
 overpayment.answer.five  = I need to let you know my overpaid P800 is wrong
-overpayment.answer.six   = I don’t understand my overpaid P800
+overpayment.answer.six   = I do not understand my overpaid P800
 overpayment.answer.seven = Coding enquiry
 
 other.answer = Not P800 or PA302

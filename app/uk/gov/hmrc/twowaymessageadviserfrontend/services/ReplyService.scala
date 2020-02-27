@@ -30,7 +30,7 @@ import uk.gov.hmrc.twowaymessageadviserfrontend.utils.NameCase
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Random
-import scala.xml.NodeBuffer
+import scala.xml.Node
 
 class ReplyService @Inject()(override val messagesApi: MessagesApi, twoWayMessageConnector: TwoWayMessageConnector)
                             (implicit ec: ExecutionContext) extends I18nSupport {
@@ -87,13 +87,14 @@ class ReplyService @Inject()(override val messagesApi: MessagesApi, twoWayMessag
     taxpayerName.trim().replaceAll("\\s+"," ")
   }
 
-  private def getMessagesHtml(replyInfo: ReplyInfo, threadSize: Int, name: Name): NodeBuffer = {
+  private def getMessagesHtml(replyInfo: ReplyInfo, threadSize: Int, name: Name): Seq[Node] = {
     val textVersion = getReplyTextVersion(threadSize)
     val adviserName = getAdviserName(name)
     <p>{Messages("reply.text.para.1", getTaxpayerName(replyInfo))}</p>
       <p>{Messages("reply.text.para.2", replyInfo.messageDate)}</p>
       <p>{Messages("reply.text.para.3." + textVersion)}</p>
       <p>{Messages("reply.text.para.4")}</p>
+      <p>{Messages("reply.text.para.5")}</p>
       <p>{Messages("reply.text.signature.1")}<br/>{adviserName}{if(adviserName!=""){<br/>}}{Messages("reply.text.signature.2")}</p>
   }
 

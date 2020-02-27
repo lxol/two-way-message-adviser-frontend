@@ -63,8 +63,8 @@ class ReplyServiceSpec extends WordSpec with Matchers {
       val expectedHtml = Html("<p>Dear Mr Mickey Mouse</p>" +
         "<p>Thank you for your message of 29th April 2019.</p>" +
         "<p>To recap your question, I think you\\'re asking for help with</p>" +
-        "<p>I believe this answers your question and hope you are satisfied with the response." +
-        " There\\'s no need to send a reply. But if you think there\\'s something important missing, just ask another question about this below.</p>" +
+        "<p>I believe this answers your question and hope you are satisfied with the response.</p>" +
+        "<p>If you think there is something important missing, use the link at the end of this message to find out how to contact HMRC.</p>" +
         "<p>Regards<br/>Minnie Mouse<br/>HMRC Digital Team</p>")
 
       val defaultHtml = replyService.getDefaultHtml(Some(metadataWithTaxpayerName), threadSize = 1,Name(Some("Minnie"),Some("Mouse")))
@@ -80,8 +80,8 @@ class ReplyServiceSpec extends WordSpec with Matchers {
       val expectedHtml = Html("<p>Dear Customer</p>" +
         "<p>Thank you for your message of 29th April 2019.</p>" +
         "<p>To recap your question, I think you\\'re asking for help with</p>" +
-        "<p>I believe this answers your question and hope you are satisfied with the response." +
-        " There\\'s no need to send a reply. But if you think there\\'s something important missing, just ask another question about this below.</p>" +
+        "<p>I believe this answers your question and hope you are satisfied with the response.</p>" +
+        "<p>If you think there is something important missing, use the link at the end of this message to find out how to contact HMRC.</p>" +
         "<p>Regards<br/>HMRC Digital Team</p>")
 
       val defaultHtml = replyService.getDefaultHtml(Some(metadataWithoutTaxpayerName),threadSize = 1,Name(None,None))

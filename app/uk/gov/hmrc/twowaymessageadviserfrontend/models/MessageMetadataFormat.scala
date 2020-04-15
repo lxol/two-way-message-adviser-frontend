@@ -20,35 +20,51 @@ import play.api.libs.json.{Format, Json}
 
 object MessageMetadataFormat {
 
-  implicit val taxIdWithNameFormat: Format[TaxIdWithName] = Json.format[TaxIdWithName]
+  implicit val taxIdWithNameFormat: Format[TaxIdWithName] =
+    Json.format[TaxIdWithName]
 
   implicit val taxEntityFormat: Format[TaxEntity] = Json.format[TaxEntity]
 
   implicit val adviserFormat: Format[Adviser] = Json.format[Adviser]
 
-  implicit val metadataDetailsFormat: Format[MetadataDetails] = Json.format[MetadataDetails]
+  implicit val metadataDetailsFormat: Format[MetadataDetails] =
+    Json.format[MetadataDetails]
 
-  implicit val taxpayerNameFormat: Format[TaxpayerName] = Json.format[TaxpayerName]
+  implicit val taxpayerNameFormat: Format[TaxpayerName] =
+    Json.format[TaxpayerName]
 
-  implicit val messageMetadataFormat: Format[MessageMetadata] = Json.format[MessageMetadata]
+  implicit val messageMetadataFormat: Format[MessageMetadata] =
+    Json.format[MessageMetadata]
 
 }
 case class TaxIdWithName(name: String, value: String)
 
-case class TaxEntity(regime: String, identifier: TaxIdWithName, email: Option[String] = None)
+case class TaxEntity(regime: String,
+                     identifier: TaxIdWithName,
+                     email: Option[String] = None)
 
 case class Adviser(pidId: String)
 
-case class MetadataDetails(threadId: Option[String], enquiryType: Option[String], adviser: Option[Adviser])
+case class MetadataDetails(threadId: Option[String],
+                           enquiryType: String,
+                           adviser: Option[Adviser])
 
-case class TaxpayerName(title: Option[String] = None, forename: Option[String] = None,
-                        secondForename: Option[String] = None, surname: Option[String] = None, honours:
-                        Option[String] = None, line1: Option[String] = None, line2: Option[String] = None,
-                        line3: Option[String] = None ) {
+case class TaxpayerName(title: Option[String] = None,
+                        forename: Option[String] = None,
+                        secondForename: Option[String] = None,
+                        surname: Option[String] = None,
+                        honours: Option[String] = None,
+                        line1: Option[String] = None,
+                        line2: Option[String] = None,
+                        line3: Option[String] = None) {
 
   override def toString: String =
     s"""${title.getOrElse("")} ${forename.getOrElse("")} ${surname.getOrElse("")}"""
 }
 
-case class MessageMetadata(id: String, recipient: TaxEntity, subject: String, details: MetadataDetails,
-                           taxpayerName: Option[TaxpayerName] = None, messageDate: String)
+case class MessageMetadata(id: String,
+                           recipient: TaxEntity,
+                           subject: String,
+                           details: MetadataDetails,
+                           taxpayerName: Option[TaxpayerName] = None,
+                           messageDate: String)

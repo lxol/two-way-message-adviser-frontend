@@ -31,27 +31,29 @@ class ReplyServiceSpec extends WordSpec with Matchers {
 
   private val metadataWithTaxpayerName = MessageMetadata(
     "",
-    TaxEntity("",TaxIdWithName("",""),None),
+    TaxEntity("", TaxIdWithName("", ""), None),
     "",
-    MetadataDetails(None,None,None),
-    Some(TaxpayerName(Some("mr"),Some("mickey"),None,Some("mouse"))),
+    MetadataDetails(None, "p800", None),
+    Some(TaxpayerName(Some("mr"), Some("mickey"), None, Some("mouse"))),
     "29th April 2019"
   )
 
   private val metadataWithPaddedTaxpayerName = MessageMetadata(
     "",
-    TaxEntity("",TaxIdWithName("",""),None),
+    TaxEntity("", TaxIdWithName("", ""), None),
     "",
-    MetadataDetails(None,None,None),
-    Some(TaxpayerName(Some(" mr "),Some(" mickey    "),None,Some("  mouse  "))),
+    MetadataDetails(None, "p800", None),
+    Some(
+      TaxpayerName(Some(" mr "), Some(" mickey    "), None, Some("  mouse  "))
+    ),
     "29th April 2019"
   )
 
   private val metadataWithoutTaxpayerName = MessageMetadata(
     "",
-    TaxEntity("",TaxIdWithName("",""),None),
+    TaxEntity("", TaxIdWithName("", ""), None),
     "",
-    MetadataDetails(None,None,None),
+    MetadataDetails(None, "p800", None),
     Some(TaxpayerName()),
     "29th April 2019"
   )
@@ -60,31 +62,47 @@ class ReplyServiceSpec extends WordSpec with Matchers {
 
     "return auto-filled HTML" in {
 
-      val expectedHtml = Html("<p>Dear Mr Mickey Mouse</p>" +
-        "<p>Thank you for your message of 29th April 2019.</p>" +
-        "<p>To recap your question, I think you\\'re asking for help with</p>" +
-        "<p>I believe this answers your question and hope you are satisfied with the response.</p>" +
-        "<p>If you think there is something important missing, use the link at the end of this message to find out how to contact HMRC.</p>" +
-        "<p>Regards<br/>Minnie Mouse<br/>HMRC Digital Team</p>")
+      val expectedHtml = Html(
+        "<p>Dear Mr Mickey Mouse</p>" +
+          "<p>Thank you for your message of 29th April 2019.</p>" +
+          "<p>To recap your question, I think you\\'re asking for help with</p>" +
+          "<p>I believe this answers your question and hope you are satisfied with the response.</p>" +
+          "<p>If you think there is something important missing, use the link at the end of this message to find out how to contact HMRC.</p>" +
+          "<p>Regards<br/>Minnie Mouse<br/>HMRC Digital Team</p>"
+      )
 
-      val defaultHtml = replyService.getDefaultHtml(Some(metadataWithTaxpayerName), threadSize = 1,Name(Some("Minnie"),Some("Mouse")))
+      val defaultHtml = replyService.getDefaultHtml(
+        metadataWithTaxpayerName,
+        threadSize = 1,
+        Name(Some("Minnie"), Some("Mouse"))
+      )
       defaultHtml shouldBe expectedHtml
 
-      val defaultHtml2 = replyService.getDefaultHtml(Some(metadataWithPaddedTaxpayerName), threadSize = 1,Name(Some("Minnie"),Some("Mouse")))
+      val defaultHtml2 = replyService.getDefaultHtml(
+        metadataWithPaddedTaxpayerName,
+        threadSize = 1,
+        Name(Some("Minnie"), Some("Mouse"))
+      )
       defaultHtml2 shouldBe expectedHtml
 
     }
 
     "return HTML with default values" in {
 
-      val expectedHtml = Html("<p>Dear Customer</p>" +
-        "<p>Thank you for your message of 29th April 2019.</p>" +
-        "<p>To recap your question, I think you\\'re asking for help with</p>" +
-        "<p>I believe this answers your question and hope you are satisfied with the response.</p>" +
-        "<p>If you think there is something important missing, use the link at the end of this message to find out how to contact HMRC.</p>" +
-        "<p>Regards<br/>HMRC Digital Team</p>")
+      val expectedHtml = Html(
+        "<p>Dear Customer</p>" +
+          "<p>Thank you for your message of 29th April 2019.</p>" +
+          "<p>To recap your question, I think you\\'re asking for help with</p>" +
+          "<p>I believe this answers your question and hope you are satisfied with the response.</p>" +
+          "<p>If you think there is something important missing, use the link at the end of this message to find out how to contact HMRC.</p>" +
+          "<p>Regards<br/>HMRC Digital Team</p>"
+      )
 
-      val defaultHtml = replyService.getDefaultHtml(Some(metadataWithoutTaxpayerName),threadSize = 1,Name(None,None))
+      val defaultHtml = replyService.getDefaultHtml(
+        metadataWithoutTaxpayerName,
+        threadSize = 1,
+        Name(None, None)
+      )
       defaultHtml shouldBe expectedHtml
     }
 

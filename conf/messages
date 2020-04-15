@@ -77,3 +77,16 @@ overpayment.answer.seven = Coding enquiry
 other.answer = Not P800 or PA302
 other.h3     = Other
 
+bta.topic.one    = No reference
+bta.topic.two    = Incorrect option
+bta.topic.three  = All debt with or Refer to Another office
+bta.topic.four   = Deferral
+bta.topic.five   = Time to Pay questions
+bta.topic.six    = Card payment
+bta.topic.seven  = Deceased
+bta.topic.eight  = Case with DCA (not a sole outcome)
+bta.topic.nine   = Deregistration
+bta.topic.ten    = Cessation
+bta.topic.eleven = Insolvent
+
+

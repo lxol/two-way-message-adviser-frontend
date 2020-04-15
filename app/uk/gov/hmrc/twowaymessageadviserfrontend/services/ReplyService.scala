@@ -17,12 +17,13 @@
 package uk.gov.hmrc.twowaymessageadviserfrontend.services
 
 import com.google.inject.Inject
+import play.api.http.Status
 import play.api.http.Status.OK
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
-import play.api.libs.json.Json
+import play.api.libs.json._
 import play.twirl.api.Html
 import uk.gov.hmrc.auth.core.retrieve.Name
-import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.{HeaderCarrier, HttpException}
 import uk.gov.hmrc.twowaymessageadviserfrontend.connectors.TwoWayMessageConnector
 import uk.gov.hmrc.twowaymessageadviserfrontend.models.MessageMetadata
 import uk.gov.hmrc.twowaymessageadviserfrontend.models.MessageMetadataFormat._
@@ -42,21 +43,22 @@ class ReplyService @Inject()(override val messagesApi: MessagesApi, twoWayMessag
   /**
     * Retrieve the message metadata
     */
-  def getMessageMetadata(messageId: String)(implicit hc: HeaderCarrier): Future[Option[MessageMetadata]] = {
-    twoWayMessageConnector.getMessageMetadata(messageId).flatMap( response =>
+
+  def getMessageMetadata(messageId: String)(implicit hc: HeaderCarrier): Future[MessageMetadata] = {
+    twoWayMessageConnector.getMessageMetadata(messageId).flatMap(response =>
       response.status match {
         case OK =>
-          val metadata = Json.parse(response.body).validate[MessageMetadata]
-          Future.successful(metadata.asOpt)
-        case _ => Future.successful(None)
+          val metadata = Json.parse(response.body).as[MessageMetadata]
+          Future.successful(metadata)
+        case _ => throw new HttpException("Failed to retrieve message metadata", Status.BAD_GATEWAY)
       })
   }
 
   /**
     * Get the default HTML with inserted values to pre-populate the adviser's reply
     */
-  def getDefaultHtml(maybeMetadata: Option[MessageMetadata], threadSize: Int, name: Name): Html = {
-    getReplyInfo(maybeMetadata) match {
+  def getDefaultHtml(metaData: MessageMetadata, threadSize: Int, name: Name): Html = {
+    getReplyInfo(metaData) match {
       case Some(replyInfo) => Html(getMessagesHtml(replyInfo,threadSize,name).mkString)
       case None => Html("")
     }
@@ -109,10 +111,9 @@ class ReplyService @Inject()(override val messagesApi: MessagesApi, twoWayMessag
     })
   }
 
-  private def getReplyInfo(maybeMetadata: Option[MessageMetadata]): Option[ReplyInfo] = {
-    maybeMetadata.flatMap(metadata => readMetadata(metadata))
+  private def getReplyInfo(metadata: MessageMetadata): Option[ReplyInfo] = {
+    readMetadata(metadata)
   }
 
   case class ReplyInfo(taxpayerName: String, messageDate: String, adviserName: String)
-
 }

@@ -26,14 +26,16 @@ import reactivemongo.bson.BSONObjectID
 import uk.gov.hmrc.auth.core.AuthProvider.PrivilegedApplication
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.retrieve.Retrievals
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import uk.gov.hmrc.twowaymessageadviserfrontend.config.FrontendAppConfig
 import uk.gov.hmrc.twowaymessageadviserfrontend.connectors.TwoWayMessageConnector
 import uk.gov.hmrc.twowaymessageadviserfrontend.controllers.util.StrideUtil
 import uk.gov.hmrc.twowaymessageadviserfrontend.forms.{ReplyFormProviderWithoutTopic, ReplyFormWithTopicProvider}
-import uk.gov.hmrc.twowaymessageadviserfrontend.models.{ReplyDetailsOptionalTopic, ReplyDetailsWithTopic}
+import uk.gov.hmrc.twowaymessageadviserfrontend.models.{MessageMetadata, ReplyDetailsOptionalTopic, ReplyDetailsWithTopic}
 import uk.gov.hmrc.twowaymessageadviserfrontend.services.ReplyService
 import uk.gov.hmrc.twowaymessageadviserfrontend.views
+
 import scala.concurrent.{ExecutionContext, Future}
 
 class ReplyController @Inject()(appConfig: FrontendAppConfig,
@@ -55,11 +57,11 @@ class ReplyController @Inject()(appConfig: FrontendAppConfig,
     implicit request =>
       authorised(AuthProviders(PrivilegedApplication)).retrieve(Retrievals.name) { name =>
         for {
-          customerId <- twoWayMessageConnector.getCustomerIdentifier(id.stringify)
-          partial <- twoWayMessageConnector.getConversationPartial(id.stringify)
-          threadSize <- twoWayMessageConnector.getMessageListSize(id.stringify)
+          customerId      <- twoWayMessageConnector.getCustomerIdentifier(id.stringify)
+          partial         <- twoWayMessageConnector.getConversationPartial(id.stringify)
+          threadSize      <- twoWayMessageConnector.getMessageListSize(id.stringify)
           messageMetadata <- replyService.getMessageMetadata(id.stringify)
-        } yield Ok(views.html.reply(appConfig, form, id, customerId, Some(replyService.getDefaultHtml(messageMetadata, threadSize, name)), partial, threadSize, messagesLinkText(threadSize))).withHeaders(CACHE_CONTROL -> "no-cache")
+        } yield Ok(views.html.reply(appConfig, form, id, customerId, Some(replyService.getDefaultHtml(messageMetadata, threadSize, name)), partial, threadSize, messagesLinkText(threadSize), messageMetadata.details.enquiryType)).withHeaders(CACHE_CONTROL -> "no-cache")
       }.recoverWith {
         case _: NoActiveSession => strideUtil.redirectToStrideLogin()
         case _: UnsupportedAuthProvider => strideUtil.redirectToStrideLogin()
@@ -84,12 +86,13 @@ class ReplyController @Inject()(appConfig: FrontendAppConfig,
     form.bindFromRequest().fold(
       (formWithErrors: Form[_]) =>
         for {
-          partial <- twoWayMessageConnector.getConversationPartial(id.stringify)
+          partial         <- twoWayMessageConnector.getConversationPartial(id.stringify)
+          messageMetadata <- replyService.getMessageMetadata(id.stringify)
         } yield {
           BadRequest(views.html.reply(
             appConfig, formWithErrors, id,
             formWithErrors.data("identifier"),
-            Some(Html(formWithErrors.data("adviser-reply").replaceAll("[\n\r]", ""))), partial, threadCount, messagesLinkText(threadCount)))
+            Some(Html(formWithErrors.data("adviser-reply").replaceAll("[\n\r]", ""))), partial, threadCount, messagesLinkText(threadCount), enquiryType = messageMetadata.details.enquiryType))
         },
       replyDetails => {
         Logger.debug(s"replyDetails: $replyDetails")
@@ -104,11 +107,12 @@ class ReplyController @Inject()(appConfig: FrontendAppConfig,
     formWithTopic.bindFromRequest().fold(
       (formWithErrors: Form[_]) =>
         for {
-          partial <- twoWayMessageConnector.getConversationPartial(id.stringify)
+          partial         <- twoWayMessageConnector.getConversationPartial(id.stringify)
+          messageMetadata <- replyService.getMessageMetadata(id.stringify)
         } yield { BadRequest(views.html.reply(
           appConfig, formWithErrors, id,
           formWithErrors.data("identifier"),
-          Some(Html(formWithErrors.data("adviser-reply").replaceAll("[\n\r]",""))), partial, threadCount, messagesLinkText(threadCount)))},
+          Some(Html(formWithErrors.data("adviser-reply").replaceAll("[\n\r]",""))), partial, threadCount, messagesLinkText(threadCount), enquiryType = messageMetadata.details.enquiryType))},
       replyDetailsWithTopic => {
         Logger.debug(s"replyDetails: $replyDetailsWithTopic")
         twoWayMessageConnector.postMessage(ReplyDetailsOptionalTopic(replyDetailsWithTopic.getContent,
@@ -124,4 +128,5 @@ class ReplyController @Inject()(appConfig: FrontendAppConfig,
       s"View $count previous message"
     else
       s"View $count previous messages"
+
 }

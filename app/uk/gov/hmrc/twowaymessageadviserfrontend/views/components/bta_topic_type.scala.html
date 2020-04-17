@@ -16,7 +16,7 @@
 
 @()(implicit messages: Messages)
 <fieldset>
-  @for(idx <- 1 to 10) {
+  @for(idx <- 1 to 11) {
     <div class="multiple-choice">
       <input id='@{s"bta-radio-$idx"}' name="topic" type="radio" value='@{messages(s"bta.topic.$idx")}'>
       <label for='@{s"bta-radio-$idx"}' >@{messages(s"bta.topic.$idx")}</label>

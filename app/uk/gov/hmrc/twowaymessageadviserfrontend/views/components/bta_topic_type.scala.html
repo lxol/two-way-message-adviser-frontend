@@ -16,49 +16,11 @@
 
 @()(implicit messages: Messages)
 <fieldset>
-  <div class="multiple-choice">
-    <input id="bta-radio-1" name="topic" type="radio" value="@messages("bta.topic.one")">
-    <label for="radio-1">@messages("bta.topic.one")</label>
-  </div>
-  <div class="multiple-choice">
-    <input id="bta-radio-2" name="topic" type="radio" value="@messages("bta.topic.two")">
-    <label for="radio-2">@messages("bta.topic.two")</label>
-  </div>
-  <div class="multiple-choice">
-    <input id="bta-radio-3" name="topic" type="radio" value="@messages("bta.topic.three")">
-    <label for="radio-3">@messages("bta.topic.three")</label>
-  </div>
-  <div class="multiple-choice">
-    <input id="bta-radio-1" name="topic" type="radio" value="@messages("bta.topic.four")">
-    <label for="radio-4">@messages("bta.topic.four")</label>
-  </div>
-  <div class="multiple-choice">
-    <input id="bta-radio-1" name="topic" type="radio" value="@messages("bta.topic.five")">
-    <label for="radio-5">@messages("bta.topic.five")</label>
-  </div>
-  <div class="multiple-choice">
-    <input id="bta-radio-1" name="topic" type="radio" value="@messages("bta.topic.six")">
-    <label for="radio-6">@messages("bta.topic.six")</label>
-  </div>
-  <div class="multiple-choice">
-    <input id="bta-radio-1" name="topic" type="radio" value="@messages("bta.topic.seven")">
-    <label for="radio-7">@messages("bta.topic.seven")</label>
-  </div>
-  <div class="multiple-choice">
-    <input id="bta-radio-1" name="topic" type="radio" value="@messages("bta.topic.eight")">
-    <label for="radio-8">@messages("bta.topic.eight")</label>
-  </div>
-  <div class="multiple-choice">
-    <input id="bta-radio-1" name="topic" type="radio" value="@messages("bta.topic.nine")">
-    <label for="radio-9">@messages("bta.topic.nine")</label>
-  </div>
-  <div class="multiple-choice">
-    <input id="bta-radio-1" name="topic" type="radio" value="@messages("bta.topic.ten")">
-    <label for="radio-10">@messages("bta.topic.ten")</label>
-  </div>
-  <div class="multiple-choice">
-    <input id="bta-radio-1" name="topic" type="radio" value="@messages("bta.topic.eleven")">
-    <label for="radio-11">@messages("bta.topic.eleven")</label>
-  </div>
+  @for(idx <- 1 to 10) {
+    <div class="multiple-choice">
+      <input id='@{s"bta-radio-$idx"}' name="topic" type="radio" value='@{messages(s"bta.topic.$idx")}'>
+      <label for='@{s"bta-radio-$idx"}' >@{messages(s"bta.topic.$idx")}</label>
+    </div>
+  }
 </fieldset>
 

@@ -14,20 +14,13 @@
  * limitations under the License.
  *@
 
-@(field: Field, enquiryType: String)(implicit messages: Messages)
-<h2 class="heading-medium">@messages("topic.h2")</h2>
-<div class="form-group @if(field.hasErrors) {form-group-error}">
-  @field.errors.map { error =>
-    <span class="error-message" id="error-message-@{
-      field.id
-    }-input">@messages(error.message, error.args: _*)</span>
+@()(implicit messages: Messages)
+<fieldset>
+  @for(idx <- 1 to 11) {
+    <div class="multiple-choice">
+      <input id='@{s"bta-radio-$idx"}' name="topic" type="radio" value='@{messages(s"bta.topic.$idx")}'>
+      <label for='@{s"bta-radio-$idx"}' >@{messages(s"bta.topic.$idx")}</label>
+    </div>
   }
-  @if(enquiryType == "p800"){
-      @underpaid_topic_type()
-      @overpaid_topic_type()
-      @other_topic_type()
-    } else {
-      @bta_topic_type()
-    }
+</fieldset>
 
-</div>

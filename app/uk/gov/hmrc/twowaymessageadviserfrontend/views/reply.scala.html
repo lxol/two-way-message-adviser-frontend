@@ -26,7 +26,7 @@
 
 @import play.twirl.api.Html
 
-@(appConfig: FrontendAppConfig, form: Form[_], id: BSONObjectID, customerId: String, content: Option[Html], contentPartial: HtmlPartial, messagesCount: Int, messagesLink: String)(implicit request: Request[_], messages: Messages)
+@(appConfig: FrontendAppConfig, form: Form[_], id: BSONObjectID, customerId: String, content: Option[Html], contentPartial: HtmlPartial, messagesCount: Int, messagesLink: String, enquiryType: String)(implicit request: Request[_], messages: Messages)
 
 @scriptElem = {
   <script type="text/javascript">
@@ -92,7 +92,8 @@
 </details>
     @if(messagesCount <= 1) {
       @components.topic_categories(
-        field = form("topic")
+        field = form("topic"),
+        enquiryType
       )
     }
     @components.submit_button()

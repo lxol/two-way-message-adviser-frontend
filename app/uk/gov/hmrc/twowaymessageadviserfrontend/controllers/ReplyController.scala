@@ -51,7 +51,7 @@ class ReplyController @Inject()(appConfig: FrontendAppConfig,
   extends FrontendController with I18nSupport with AuthorisedFunctions {
 
   val form:          Form[ReplyDetailsOptionalTopic] = formProvider()
-  val formWithTopic: Form[ReplyDetailsWithTopic] = formProviderWithTopic()
+  val formWithTopic: Form[ReplyDetailsWithTopic]     = formProviderWithTopic()
 
   def onPageLoad(id: BSONObjectID): Action[AnyContent] = Action.async {
     implicit request =>
@@ -71,10 +71,12 @@ class ReplyController @Inject()(appConfig: FrontendAppConfig,
   def onSubmit(id: BSONObjectID, threadCount: Int): Action[AnyContent] = Action.async {
     implicit request =>
       authorised(AuthProviders(PrivilegedApplication)) {
-        if(threadCount > 1) {
-          subsequentMessage(id, threadCount)
-        } else {
-          firstMessage(id, threadCount)
+        replyService.getMessageMetadata(id.stringify).flatMap { enquiryType =>
+          if (threadCount > 1) {
+            subsequentMessage(id, threadCount)
+          } else {
+            firstMessage(id, threadCount, enquiryType.details.enquiryType)
+          }
         }
       }.recoverWith {
         case _: NoActiveSession => strideUtil.redirectToStrideLogin()
@@ -103,24 +105,45 @@ class ReplyController @Inject()(appConfig: FrontendAppConfig,
     )
   }
 
-  private def firstMessage(id: BSONObjectID, threadCount: Int)(implicit request: Request[_]): Future[Result] = {
-    formWithTopic.bindFromRequest().fold(
-      (formWithErrors: Form[_]) =>
-        for {
-          partial         <- twoWayMessageConnector.getConversationPartial(id.stringify)
-          messageMetadata <- replyService.getMessageMetadata(id.stringify)
-        } yield { BadRequest(views.html.reply(
-          appConfig, formWithErrors, id,
-          formWithErrors.data("identifier"),
-          Some(Html(formWithErrors.data("adviser-reply").replaceAll("[\n\r]",""))), partial, threadCount, messagesLinkText(threadCount), enquiryType = messageMetadata.details.enquiryType))},
-      replyDetailsWithTopic => {
-        Logger.debug(s"replyDetails: $replyDetailsWithTopic")
-        twoWayMessageConnector.postMessage(ReplyDetailsOptionalTopic(replyDetailsWithTopic.getContent,
-          Some(replyDetailsWithTopic.topic)), id.stringify).map { _ =>
-          Redirect(routes.ReplyFeedbackSuccessController.onPageLoad(id))
+  private def firstMessage(id: BSONObjectID, threadCount: Int, enquiryType: String)(implicit request: Request[_]): Future[Result] = {
+    if(enquiryType == "epaye-jrs") {
+      form.bindFromRequest().fold(
+        (formWithErrors: Form[_]) =>
+          for {
+            partial         <- twoWayMessageConnector.getConversationPartial(id.stringify)
+            messageMetadata <- replyService.getMessageMetadata(id.stringify)
+          } yield {
+            BadRequest(views.html.reply(
+              appConfig, formWithErrors, id,
+              formWithErrors.data("identifier"),
+              Some(Html(formWithErrors.data("adviser-reply").replaceAll("[\n\r]", ""))), partial, threadCount, messagesLinkText(threadCount), enquiryType = messageMetadata.details.enquiryType))
+          },
+        replyDetails => {
+          Logger.debug(s"replyDetails: $replyDetails")
+          twoWayMessageConnector.postMessage(replyDetails, id.stringify).map { _ =>
+            Redirect(routes.ReplyFeedbackSuccessController.onPageLoad(id))
+          }
         }
-      }
-    )
+      )
+    } else {
+      formWithTopic.bindFromRequest().fold(
+        (formWithErrors: Form[_]) =>
+          for {
+            partial         <- twoWayMessageConnector.getConversationPartial(id.stringify)
+            messageMetadata <- replyService.getMessageMetadata(id.stringify)
+          } yield { BadRequest(views.html.reply(
+            appConfig, formWithErrors, id,
+            formWithErrors.data("identifier"),
+            Some(Html(formWithErrors.data("adviser-reply").replaceAll("[\n\r]",""))), partial, threadCount, messagesLinkText(threadCount), enquiryType = messageMetadata.details.enquiryType))},
+        replyDetailsWithTopic => {
+          Logger.debug(s"replyDetails: $replyDetailsWithTopic")
+          twoWayMessageConnector.postMessage(ReplyDetailsOptionalTopic(replyDetailsWithTopic.getContent,
+            Some(replyDetailsWithTopic.topic)), id.stringify).map { _ =>
+            Redirect(routes.ReplyFeedbackSuccessController.onPageLoad(id))
+          }
+        }
+      )
+    }
   }
 
   private def messagesLinkText(count: Int) =

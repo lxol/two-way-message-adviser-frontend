@@ -90,7 +90,7 @@
         @contentPartial.successfulContentOrElse(Html("Sorry, there's been a problem retrieving message content."))
     </div>
 </details>
-    @if(messagesCount <= 1) {
+    @if(messagesCount <= 1 && enquiryType != "epaye-jrs") {
       @components.topic_categories(
         field = form("topic"),
         enquiryType

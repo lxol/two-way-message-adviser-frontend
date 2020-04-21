@@ -67,6 +67,14 @@ class ReplyControllerSpec
     Some(TaxpayerName(Some("mr"), Some("mickey"), None, Some("mouse"))),
     "29th April 2019"
   )
+  private val mockJrsMessageMetadata = MessageMetadata(
+    "",
+    TaxEntity("", TaxIdWithName("", ""), None),
+    "",
+    MetadataDetails(None, "epaye-jrs", None),
+    Some(TaxpayerName(Some("mr"), Some("mickey"), None, Some("mouse"))),
+    "29th April 2019"
+  )
   override val injector = new GuiceApplicationBuilder()
     .configure(Configuration("metrics.enabled" -> false))
     .overrides(new AbstractModule with ScalaModule {
@@ -127,6 +135,24 @@ class ReplyControllerSpec
       contentAsString(result) contains "<h1 class=\"heading-large\">Reply to a secure question</h1>"
       contentAsString(result) contains s"$messagePartial"
       contentAsString(result) must include("No reference")
+    }
+
+    "Given request to onload when request is authorised, return reply screen with original customer message with no categories for a JRS customer" in {
+      mockAuthorise(AuthProviders(PrivilegedApplication), Retrievals.name)(
+        Future.successful(Name(Some("TestUser"), None))
+      )
+      mockSuccessfulMetadata(ID.stringify)(hc)
+      mockSuccessfulConversationPartial(ID.stringify)(hc)
+      mockSuccessfulMessageListSize(ID.stringify)(hc)
+      when(mockReplyService.getMessageMetadata(any[String])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(mockJrsMessageMetadata))
+      val result = call(controller.onPageLoad(ID), fakeRequest)
+
+      contentAsString(result) contains "<h1 class=\"heading-large\">Reply to a secure question</h1>"
+      contentAsString(result) contains s"$messagePartial"
+      contentAsString(result) must not include "No reference"
+      contentAsString(result) must not include "Underpaid"
+      contentAsString(result) must not include "What is the topic of this reply"
     }
 
     "include link to view the first message" in {

@@ -63,12 +63,10 @@ class ReplyServiceSpec extends WordSpec with Matchers {
     "return auto-filled HTML" in {
 
       val expectedHtml = Html(
-        "<p>Dear Mr Mickey Mouse</p>" +
-          "<p>Thank you for your message of 29th April 2019.</p>" +
-          "<p>To recap your question, I think you\\'re asking for help with</p>" +
-          "<p>I believe this answers your question and hope you are satisfied with the response.</p>" +
-          "<p>If you think there is something important missing, use the link at the end of this message to find out how to contact HMRC.</p>" +
-          "<p>Regards<br/>Minnie Mouse<br/>HMRC Digital Team</p>"
+        "<p>Dear Customer</p>" +
+          "<p>We recently spoke to you by phone, and believe we have now answered your question.</p>" +
+          "<p>Because of this we have now closed your query.</p>" +
+          "<p>Regards<br/>HMRC adviser team</p>"
       )
 
       val defaultHtml = replyService.getDefaultHtml(
@@ -91,11 +89,9 @@ class ReplyServiceSpec extends WordSpec with Matchers {
 
       val expectedHtml = Html(
         "<p>Dear Customer</p>" +
-          "<p>Thank you for your message of 29th April 2019.</p>" +
-          "<p>To recap your question, I think you\\'re asking for help with</p>" +
-          "<p>I believe this answers your question and hope you are satisfied with the response.</p>" +
-          "<p>If you think there is something important missing, use the link at the end of this message to find out how to contact HMRC.</p>" +
-          "<p>Regards<br/>HMRC Digital Team</p>"
+          "<p>We recently spoke to you by phone, and believe we have now answered your question.</p>" +
+          "<p>Because of this we have now closed your query.</p>" +
+          "<p>Regards<br/>HMRC adviser team</p>"
       )
 
       val defaultHtml = replyService.getDefaultHtml(

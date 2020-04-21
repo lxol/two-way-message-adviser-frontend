@@ -28,45 +28,10 @@
 
 @(appConfig: FrontendAppConfig, form: Form[_], id: BSONObjectID, customerId: String, content: Option[Html], contentPartial: HtmlPartial, messagesCount: Int, messagesLink: String, enquiryType: String)(implicit request: Request[_], messages: Messages)
 
-@scriptElem = {
-  <script type="text/javascript">
-          if (typeof CKEDITOR !== 'undefined') {
-            for (var instanceName in CKEDITOR.instances) {
-              if (typeof CKEDITOR.instances[instanceName] !== 'undefined') {
-                debugger;
-                CKEDITOR.instances[instanceName].destroy();
-              }
-            }
-          }
-          CKEDITOR.replace( '@{form("adviser-reply").id}', {
-            contentsCss: '@routes.Assets.versioned("stylesheets/editor.css")',
-            stylesSet: 'gov_uk',
-            toolbarGroups: [
-              { name: 'document', groups: [ 'mode', 'document', 'doctools' ] },
-              { name: 'editing', groups: [ 'find', 'selection', 'spellchecker', 'editing' ] },
-              { name: 'forms', groups: [ 'forms' ] },
-              { name: 'basicstyles', groups: [ 'basicstyles', 'cleanup' ] },
-              { name: 'paragraph', groups: [ 'list', 'indent', 'blocks', 'align', 'bidi', 'paragraph' ] },
-              { name: 'links', groups: [ 'links' ] },
-              { name: 'clipboard', groups: [ 'clipboard', 'undo' ] },
-              { name: 'insert', groups: [ 'insert' ] },
-              { name: 'styles', groups: [ 'styles' ] },
-              { name: 'colors', groups: [ 'colors' ] },
-              { name: 'tools', groups: [ 'tools' ] },
-              { name: 'others', groups: [ 'others' ] },
-              { name: 'about', groups: [ 'about' ] }
-            ],
-            removeButtons: 'Italic,Underline,Strike,Subscript,Superscript,CopyFormatting,RemoveFormat,Outdent,Indent,CreateDiv,Blockquote,JustifyLeft,JustifyCenter,JustifyRight,JustifyBlock,BidiLtr,BidiRtl,Unlink,Anchor,Language,Source,Save,NewPage,Templates,Preview,Print,Cut,Copy,Paste,PasteText,PasteFromWord,Find,Replace,SelectAll,Form,Checkbox,Radio,TextField,Textarea,Select,Button,ImageButton,HiddenField,Image,Flash,Table,HorizontalRule,Smiley,SpecialChar,PageBreak,Iframe,Styles,Format,Font,FontSize,TextColor,BGColor,ShowBlocks,Maximize,About'
-          });
-          CKEDITOR.instances['@{form("adviser-reply").id}'].setData('@{content.getOrElse("")}');
-  </script>
-}
-
 @main_template(
   title = messages("reply.title"),
   appConfig = appConfig,
-  bodyClasses = None,
-  scriptElem = Some(scriptElem)) {
+  bodyClasses = None) {
 
   @components.back_link()
 

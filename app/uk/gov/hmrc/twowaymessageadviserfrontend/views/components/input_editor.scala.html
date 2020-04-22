@@ -27,6 +27,7 @@
         }
     </label>
     <div class="form-control-wrapper full-width">
-        <textarea name="@{field.id}" id="@{field.id}" rows="10" cols="80"></textarea>
+        <div style="border-style:solid;border-width:2px;width:75%;background-color:#f3f2f1;padding:10px;margin-top:10px;">@content</div>
+        <textarea name="@{field.id}" id="@{field.id}" rows="10" cols="80" style="display:none;">@content</textarea>
     </div>
 </div>

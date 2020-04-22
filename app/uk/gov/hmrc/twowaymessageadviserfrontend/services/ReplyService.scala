@@ -90,14 +90,11 @@ class ReplyService @Inject()(override val messagesApi: MessagesApi, twoWayMessag
   }
 
   private def getMessagesHtml(replyInfo: ReplyInfo, threadSize: Int, name: Name): Seq[Node] = {
-    val textVersion = getReplyTextVersion(threadSize)
     val adviserName = getAdviserName(name)
     <p>{Messages("reply.text.para.1", getTaxpayerName(replyInfo))}</p>
-      <p>{Messages("reply.text.para.2", replyInfo.messageDate)}</p>
-      <p>{Messages("reply.text.para.3." + textVersion)}</p>
-      <p>{Messages("reply.text.para.4")}</p>
-      <p>{Messages("reply.text.para.5")}</p>
-      <p>{Messages("reply.text.signature.1")}<br/>{adviserName}{if(adviserName!=""){<br/>}}{Messages("reply.text.signature.2")}</p>
+      <p>{Messages("reply.text.para.2")}</p>
+      <p>{Messages("reply.text.para.3")}</p>
+      <p>{Messages("reply.text.signature.1")}<br/>{Messages("reply.text.signature.2")}</p>
   }
 
   private def readMetadata(metadata: MessageMetadata): Option[ReplyInfo] = {

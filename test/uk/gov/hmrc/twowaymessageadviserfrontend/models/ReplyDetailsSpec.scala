@@ -29,14 +29,14 @@ class ReplyDetailsSpec extends WordSpec with Matchers {
   "ReplyFormProvider.getContent" should {
 
     "add list classes to" in {
-      val reply = ReplyDetailsOptionalTopic(exampleInput, None)
+      val reply = ReplyDetailsOptionalTopic(exampleInput, None, "", 1)
       reply.getContent shouldEqual expectedOutput
     }
   }
 
   "ReplyForProvider which contains a topic" should {
     "creation of a reply including a topic" in {
-      val reply = ReplyDetailsOptionalTopic(exampleInput, Some(topic))
+      val reply = ReplyDetailsOptionalTopic(exampleInput, Some(topic), "", 1)
       reply.topic.get shouldEqual topic
     }
   }

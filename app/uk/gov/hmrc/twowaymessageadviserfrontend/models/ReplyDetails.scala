@@ -70,11 +70,7 @@ trait ReplyDetails {
   }
 }
 
-case class ReplyDetailsWithTopic(private val content: String, topic: String) extends ReplyDetails {
-  def getContent: String = getContent(content)
-}
-
-case class ReplyDetailsOptionalTopic(private val content: String, topic: Option[String]) extends ReplyDetails {
+case class ReplyDetailsOptionalTopic(private val content: String, topic: Option[String], enquiryType: String, messageCount: Int) extends ReplyDetails {
   def getContent: String = getContent(content)
 }
 

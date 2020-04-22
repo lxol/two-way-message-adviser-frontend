@@ -207,13 +207,17 @@ class ReplyControllerSpec
         fakeReplyRequest
           .withFormUrlEncodedBody(
             "adviser-reply" -> "content " * 50,
-            "identifier" -> "P800",
-            "topic" -> "topic"
+            "identifier" -> "p800",
+            "topic" -> "topic",
+            "enquiry-type"  -> "p800",
+            "message-count" -> "1"
           )
       mockSuccessfulMessagePartial(ID.stringify)(hc)
       mockAuthorise(AuthProviders(PrivilegedApplication))(
         Future.successful(Some(""))
       )
+      mockSuccessfulConversationPartial(ID.stringify)(hc)
+      mockSuccessfulMessageListSize(ID.stringify)(hc)
       mockPostMessage(ID.stringify)(hc)
 
       val result = await(

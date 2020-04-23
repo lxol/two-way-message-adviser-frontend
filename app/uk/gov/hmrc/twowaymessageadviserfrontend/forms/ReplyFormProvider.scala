@@ -51,11 +51,7 @@ class ReplyFormProvider @Inject() extends Mappings {
       }
 
     } else {
-      (replyDetailsOptionalTopic.enquiryType, replyDetailsOptionalTopic.topic) match {
-        case (_,           None)    => true
-        case ("epaye-jrs", Some(_)) => false
-        case (_,           Some(_)) => false
-      }
+      replyDetailsOptionalTopic.topic.isEmpty
     }
   }
 }

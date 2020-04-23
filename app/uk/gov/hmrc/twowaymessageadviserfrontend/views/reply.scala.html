@@ -41,6 +41,8 @@
 
   @helpers.form(action = ReplyController.onSubmit(id, messagesCount), 'autoComplete -> "off") {
     <input type="hidden" name='identifier' value="@{customerId}">
+    <input type="hidden" name='enquiry-type' value="@{enquiryType}">
+    <input type="hidden" name='message-count' value="@{messagesCount}">
 
     @components.input_editor(
       field = form("adviser-reply"),
@@ -55,7 +57,7 @@
         @contentPartial.successfulContentOrElse(Html("Sorry, there's been a problem retrieving message content."))
     </div>
 </details>
-    @if(messagesCount <= 1) {
+    @if(messagesCount <= 1 && enquiryType != "epaye-jrs") {
       @components.topic_categories(
         field = form("topic"),
         enquiryType

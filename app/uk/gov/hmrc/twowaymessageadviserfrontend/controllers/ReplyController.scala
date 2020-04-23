@@ -19,29 +19,27 @@ package uk.gov.hmrc.twowaymessageadviserfrontend.controllers
 import com.google.inject.Inject
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, Request, Result}
+import play.api.mvc.{Action, AnyContent}
 import play.api.{Configuration, Environment, Logger}
 import play.twirl.api.Html
 import reactivemongo.bson.BSONObjectID
 import uk.gov.hmrc.auth.core.AuthProvider.PrivilegedApplication
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.retrieve.Retrievals
-import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import uk.gov.hmrc.twowaymessageadviserfrontend.config.FrontendAppConfig
 import uk.gov.hmrc.twowaymessageadviserfrontend.connectors.TwoWayMessageConnector
 import uk.gov.hmrc.twowaymessageadviserfrontend.controllers.util.StrideUtil
-import uk.gov.hmrc.twowaymessageadviserfrontend.forms.{ReplyFormProviderWithoutTopic, ReplyFormWithTopicProvider}
-import uk.gov.hmrc.twowaymessageadviserfrontend.models.{MessageMetadata, ReplyDetailsOptionalTopic, ReplyDetailsWithTopic}
+import uk.gov.hmrc.twowaymessageadviserfrontend.forms.ReplyFormProvider
+import uk.gov.hmrc.twowaymessageadviserfrontend.models.ReplyDetailsOptionalTopic
 import uk.gov.hmrc.twowaymessageadviserfrontend.services.ReplyService
 import uk.gov.hmrc.twowaymessageadviserfrontend.views
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 class ReplyController @Inject()(appConfig: FrontendAppConfig,
                                 override val messagesApi: MessagesApi,
-                                formProvider: ReplyFormProviderWithoutTopic,
-                                formProviderWithTopic: ReplyFormWithTopicProvider,
+                                formProvider: ReplyFormProvider,
                                 val config: Configuration,
                                 val env: Environment,
                                 val authConnector: AuthConnector,
@@ -51,7 +49,6 @@ class ReplyController @Inject()(appConfig: FrontendAppConfig,
   extends FrontendController with I18nSupport with AuthorisedFunctions {
 
   val form:          Form[ReplyDetailsOptionalTopic] = formProvider()
-  val formWithTopic: Form[ReplyDetailsWithTopic] = formProviderWithTopic()
 
   def onPageLoad(id: BSONObjectID): Action[AnyContent] = Action.async {
     implicit request =>
@@ -71,56 +68,28 @@ class ReplyController @Inject()(appConfig: FrontendAppConfig,
   def onSubmit(id: BSONObjectID, threadCount: Int): Action[AnyContent] = Action.async {
     implicit request =>
       authorised(AuthProviders(PrivilegedApplication)) {
-        if(threadCount > 1) {
-          subsequentMessage(id, threadCount)
-        } else {
-          firstMessage(id, threadCount)
-        }
+          form.bindFromRequest().fold(
+            (formWithErrors: Form[_]) =>
+              for {
+                partial         <- twoWayMessageConnector.getConversationPartial(id.stringify)
+                messageMetadata <- replyService.getMessageMetadata(id.stringify)
+              } yield {
+                BadRequest(views.html.reply(
+                  appConfig, formWithErrors, id,
+                  formWithErrors.data("identifier"),
+                  Some(Html(formWithErrors.data("adviser-reply").replaceAll("[\n\r]", ""))), partial, threadCount, messagesLinkText(threadCount), enquiryType = messageMetadata.details.enquiryType))
+              },
+            replyDetails => {
+              Logger.debug(s"replyDetails: $replyDetails")
+              twoWayMessageConnector.postMessage(replyDetails, id.stringify).map { _ =>
+                Redirect(routes.ReplyFeedbackSuccessController.onPageLoad(id))
+              }
+            }
+          )
       }.recoverWith {
         case _: NoActiveSession => strideUtil.redirectToStrideLogin()
         case _: UnsupportedAuthProvider => strideUtil.redirectToStrideLogin()
       }
-  }
-
-  private def subsequentMessage(id: BSONObjectID, threadCount: Int)(implicit request: Request[_]): Future[Result] = {
-    form.bindFromRequest().fold(
-      (formWithErrors: Form[_]) =>
-        for {
-          partial         <- twoWayMessageConnector.getConversationPartial(id.stringify)
-          messageMetadata <- replyService.getMessageMetadata(id.stringify)
-        } yield {
-          BadRequest(views.html.reply(
-            appConfig, formWithErrors, id,
-            formWithErrors.data("identifier"),
-            Some(Html(formWithErrors.data("adviser-reply").replaceAll("[\n\r]", ""))), partial, threadCount, messagesLinkText(threadCount), enquiryType = messageMetadata.details.enquiryType))
-        },
-      replyDetails => {
-        Logger.debug(s"replyDetails: $replyDetails")
-        twoWayMessageConnector.postMessage(replyDetails, id.stringify).map { _ =>
-          Redirect(routes.ReplyFeedbackSuccessController.onPageLoad(id))
-        }
-      }
-    )
-  }
-
-  private def firstMessage(id: BSONObjectID, threadCount: Int)(implicit request: Request[_]): Future[Result] = {
-    formWithTopic.bindFromRequest().fold(
-      (formWithErrors: Form[_]) =>
-        for {
-          partial         <- twoWayMessageConnector.getConversationPartial(id.stringify)
-          messageMetadata <- replyService.getMessageMetadata(id.stringify)
-        } yield { BadRequest(views.html.reply(
-          appConfig, formWithErrors, id,
-          formWithErrors.data("identifier"),
-          Some(Html(formWithErrors.data("adviser-reply").replaceAll("[\n\r]",""))), partial, threadCount, messagesLinkText(threadCount), enquiryType = messageMetadata.details.enquiryType))},
-      replyDetailsWithTopic => {
-        Logger.debug(s"replyDetails: $replyDetailsWithTopic")
-        twoWayMessageConnector.postMessage(ReplyDetailsOptionalTopic(replyDetailsWithTopic.getContent,
-          Some(replyDetailsWithTopic.topic)), id.stringify).map { _ =>
-          Redirect(routes.ReplyFeedbackSuccessController.onPageLoad(id))
-        }
-      }
-    )
   }
 
   private def messagesLinkText(count: Int) =

@@ -18,9 +18,9 @@ package uk.gov.hmrc.twowaymessageadviserfrontend.controllers
 
 import com.google.inject.Inject
 import play.api.data.Form
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent}
-import play.api.{Configuration, Environment, Logger}
+import play.api.i18n.{ I18nSupport, MessagesApi }
+import play.api.mvc.{ Action, AnyContent }
+import play.api.{ Configuration, Environment, Logger }
 import play.twirl.api.Html
 import reactivemongo.bson.BSONObjectID
 import uk.gov.hmrc.auth.core.AuthProvider.PrivilegedApplication
@@ -37,59 +37,80 @@ import uk.gov.hmrc.twowaymessageadviserfrontend.views
 
 import scala.concurrent.ExecutionContext
 
-class ReplyController @Inject()(appConfig: FrontendAppConfig,
-                                override val messagesApi: MessagesApi,
-                                formProvider: ReplyFormProvider,
-                                val config: Configuration,
-                                val env: Environment,
-                                val authConnector: AuthConnector,
-                                val strideUtil: StrideUtil,
-                                val twoWayMessageConnector: TwoWayMessageConnector,
-                                val replyService: ReplyService)(implicit ec:ExecutionContext)
-  extends FrontendController with I18nSupport with AuthorisedFunctions {
+class ReplyController @Inject()(
+  appConfig: FrontendAppConfig,
+  override val messagesApi: MessagesApi,
+  formProvider: ReplyFormProvider,
+  val config: Configuration,
+  val env: Environment,
+  val authConnector: AuthConnector,
+  val strideUtil: StrideUtil,
+  val twoWayMessageConnector: TwoWayMessageConnector,
+  val replyService: ReplyService)(implicit ec: ExecutionContext)
+    extends FrontendController with I18nSupport with AuthorisedFunctions {
 
-  val form:          Form[ReplyDetailsOptionalTopic] = formProvider()
+  val form: Form[ReplyDetailsOptionalTopic] = formProvider()
 
-  def onPageLoad(id: BSONObjectID): Action[AnyContent] = Action.async {
-    implicit request =>
-      authorised(AuthProviders(PrivilegedApplication)).retrieve(Retrievals.name) { name =>
+  def onPageLoad(id: BSONObjectID): Action[AnyContent] = Action.async { implicit request =>
+    authorised(AuthProviders(PrivilegedApplication))
+      .retrieve(Retrievals.name) { name =>
         for {
           customerId      <- twoWayMessageConnector.getCustomerIdentifier(id.stringify)
           partial         <- twoWayMessageConnector.getConversationPartial(id.stringify)
           threadSize      <- twoWayMessageConnector.getMessageListSize(id.stringify)
           messageMetadata <- replyService.getMessageMetadata(id.stringify)
-        } yield Ok(views.html.reply(appConfig, form, id, customerId, Some(replyService.getDefaultHtml(messageMetadata, threadSize, name)), partial, threadSize, messagesLinkText(threadSize), messageMetadata.details.enquiryType)).withHeaders(CACHE_CONTROL -> "no-cache")
-      }.recoverWith {
-        case _: NoActiveSession => strideUtil.redirectToStrideLogin()
+        } yield
+          Ok(views.html.reply(
+            appConfig,
+            form,
+            id,
+            customerId,
+            Some(replyService.getDefaultHtml(messageMetadata, threadSize, name)),
+            partial,
+            threadSize,
+            messagesLinkText(threadSize),
+            messageMetadata.details.enquiryType
+          )).withHeaders(CACHE_CONTROL -> "no-cache")
+      }
+      .recoverWith {
+        case _: NoActiveSession         => strideUtil.redirectToStrideLogin()
         case _: UnsupportedAuthProvider => strideUtil.redirectToStrideLogin()
       }
   }
 
-  def onSubmit(id: BSONObjectID, threadCount: Int): Action[AnyContent] = Action.async {
-    implicit request =>
-      authorised(AuthProviders(PrivilegedApplication)) {
-          form.bindFromRequest().fold(
-            (formWithErrors: Form[_]) =>
-              for {
-                partial         <- twoWayMessageConnector.getConversationPartial(id.stringify)
-                messageMetadata <- replyService.getMessageMetadata(id.stringify)
-              } yield {
-                BadRequest(views.html.reply(
-                  appConfig, formWithErrors, id,
-                  formWithErrors.data("identifier"),
-                  Some(Html(formWithErrors.data("adviser-reply").replaceAll("[\n\r]", ""))), partial, threadCount, messagesLinkText(threadCount), enquiryType = messageMetadata.details.enquiryType))
-              },
-            replyDetails => {
-              Logger.debug(s"replyDetails: $replyDetails")
-              twoWayMessageConnector.postMessage(replyDetails, id.stringify).map { _ =>
-                Redirect(routes.ReplyFeedbackSuccessController.onPageLoad(id))
-              }
+  def onSubmit(id: BSONObjectID, threadCount: Int): Action[AnyContent] = Action.async { implicit request =>
+    authorised(AuthProviders(PrivilegedApplication)) {
+      form
+        .bindFromRequest()
+        .fold(
+          (formWithErrors: Form[_]) =>
+            for {
+              partial         <- twoWayMessageConnector.getConversationPartial(id.stringify)
+              messageMetadata <- replyService.getMessageMetadata(id.stringify)
+            } yield {
+              BadRequest(views.html.reply(
+                appConfig,
+                formWithErrors,
+                id,
+                formWithErrors.data("identifier"),
+                Some(Html(formWithErrors.data("adviser-reply").replaceAll("[\n\r]", ""))),
+                partial,
+                threadCount,
+                messagesLinkText(threadCount),
+                enquiryType = messageMetadata.details.enquiryType
+              ))
+          },
+          replyDetails => {
+            Logger.debug(s"replyDetails: $replyDetails")
+            twoWayMessageConnector.postMessage(replyDetails, id.stringify).map { _ =>
+              Redirect(routes.ReplyFeedbackSuccessController.onPageLoad(id))
             }
-          )
-      }.recoverWith {
-        case _: NoActiveSession => strideUtil.redirectToStrideLogin()
-        case _: UnsupportedAuthProvider => strideUtil.redirectToStrideLogin()
-      }
+          }
+        )
+    }.recoverWith {
+      case _: NoActiveSession         => strideUtil.redirectToStrideLogin()
+      case _: UnsupportedAuthProvider => strideUtil.redirectToStrideLogin()
+    }
   }
 
   private def messagesLinkText(count: Int) =

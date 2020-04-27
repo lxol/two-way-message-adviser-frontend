@@ -28,23 +28,17 @@ import play.api.test.Helpers._
 import reactivemongo.bson.BSONObjectID
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.AuthProvider.PrivilegedApplication
-import uk.gov.hmrc.auth.core.retrieve.{Name, Retrievals}
+import uk.gov.hmrc.auth.core.retrieve.{ Name, Retrievals }
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.twowaymessageadviserfrontend.base.SpecBase
 import uk.gov.hmrc.twowaymessageadviserfrontend.connectors.TwoWayMessageConnector
-import uk.gov.hmrc.twowaymessageadviserfrontend.connectors.mocks.{
-  MockAuthConnector,
-  MockTwoWayMessageConnector
-}
+import uk.gov.hmrc.twowaymessageadviserfrontend.connectors.mocks.{ MockAuthConnector, MockTwoWayMessageConnector }
 import uk.gov.hmrc.twowaymessageadviserfrontend.models._
 import uk.gov.hmrc.twowaymessageadviserfrontend.services.ReplyService
 
 import scala.concurrent.Future
 
-class ReplyControllerSpec
-    extends SpecBase
-    with MockAuthConnector
-    with MockTwoWayMessageConnector {
+class ReplyControllerSpec extends SpecBase with MockAuthConnector with MockTwoWayMessageConnector {
 
   private val ID: BSONObjectID =
     BSONObjectID.parse("5c18eb166f0000110204b160").get
@@ -207,8 +201,8 @@ class ReplyControllerSpec
         fakeReplyRequest
           .withFormUrlEncodedBody(
             "adviser-reply" -> "content " * 50,
-            "identifier" -> "p800",
-            "topic" -> "topic",
+            "identifier"    -> "p800",
+            "topic"         -> "topic",
             "enquiry-type"  -> "p800",
             "message-count" -> "1"
           )
@@ -235,7 +229,7 @@ class ReplyControllerSpec
         fakeReplyRequest
           .withFormUrlEncodedBody(
             "adviser-reply" -> "not enough content",
-            "identifier" -> "p800"
+            "identifier"    -> "p800"
           )
       mockAuthorise(AuthProviders(PrivilegedApplication))(
         Future.successful(Some(""))
@@ -246,7 +240,7 @@ class ReplyControllerSpec
       val result =
         call(controller.onSubmit(ID, threadSize), badRequestWithFormData)
       contentAsString(result) contains "<a href=\"#content\">Minimum length is 100</a>"
-      contentAsString(result) contains s"${messagePartial}"
+      contentAsString(result) contains s"$messagePartial"
       contentAsString(result) must include("View 1 previous message")
     }
   }

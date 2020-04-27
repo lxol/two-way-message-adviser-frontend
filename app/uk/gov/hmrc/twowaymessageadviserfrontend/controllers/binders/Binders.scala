@@ -16,32 +16,40 @@
 
 package uk.gov.hmrc.twowaymessageadviserfrontend.controllers.binders
 
-import play.api.mvc.{PathBindable, QueryStringBindable}
+import play.api.mvc.{ PathBindable, QueryStringBindable }
 import reactivemongo.bson.BSONObjectID
 
-import scala.util.{Failure, Success}
+import scala.util.{ Failure, Success }
 
 object Binders {
 
   implicit val BSONObjectIdBinder: QueryStringBindable[BSONObjectID] = new QueryStringBindable[BSONObjectID] {
     def bind(key: String, params: Map[String, Seq[String]]): Option[Either[String, BSONObjectID]] =
-      params.get(key).flatMap(_.headOption).map(value => BSONObjectID.parse(value) match {
-        case Success(boid) => Some(Right(boid))
-        case Failure(_) => Some(Left(s"ID $value was invalid"))
-      }).getOrElse( Some(Left(s"Cannot parse parameter '$key' with parameters '$params' as 'BSONObjectID'")) )
+      params
+        .get(key)
+        .flatMap(_.headOption)
+        .map(value =>
+          BSONObjectID.parse(value) match {
+            case Success(boid) => Some(Right(boid))
+            case Failure(_)    => Some(Left(s"ID $value was invalid"))
+        })
+        .getOrElse(Some(Left(s"Cannot parse parameter '$key' with parameters '$params' as 'BSONObjectID'")))
 
-    def unbind(key: String, value: BSONObjectID): String = QueryStringBindable.bindableString.unbind(key, value.stringify)
+    def unbind(key: String, value: BSONObjectID): String =
+      QueryStringBindable.bindableString.unbind(key, value.stringify)
   }
 
-  implicit def bsonIdBinder(implicit stringBinder: PathBindable[String]): PathBindable[BSONObjectID] = new PathBindable[BSONObjectID] {
-    def bind(key: String, value: String): Either[String, BSONObjectID] = stringBinder.bind(key,value) match {
-      case Left(msg) => Left(msg)
-      case Right(id) => BSONObjectID.parse(id) match {
-        case Success(boid) => Right(boid)
-        case Failure(_) => Left(s"ID $id was invalid")
+  implicit def bsonIdBinder(implicit stringBinder: PathBindable[String]): PathBindable[BSONObjectID] =
+    new PathBindable[BSONObjectID] {
+      def bind(key: String, value: String): Either[String, BSONObjectID] = stringBinder.bind(key, value) match {
+        case Left(msg) => Left(msg)
+        case Right(id) =>
+          BSONObjectID.parse(id) match {
+            case Success(boid) => Right(boid)
+            case Failure(_)    => Left(s"ID $id was invalid")
+          }
       }
-    }
 
-    def unbind(key: String, value: BSONObjectID): String = value.stringify
-  }
+      def unbind(key: String, value: BSONObjectID): String = value.stringify
+    }
 }

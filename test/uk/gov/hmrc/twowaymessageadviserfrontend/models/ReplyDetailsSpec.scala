@@ -16,13 +16,15 @@
 
 package uk.gov.hmrc.twowaymessageadviserfrontend.models
 
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.{ Matchers, WordSpec }
 
 class ReplyDetailsSpec extends WordSpec with Matchers {
 
-  val exampleInput = <p>test</p><ul><li>test</li><li>test</li></ul><p>test</p><ol><li>test</li><li>test</li></ol>.mkString
+  val exampleInput =
+    <p>test</p><ul><li>test</li><li>test</li></ul><p>test</p><ol><li>test</li><li>test</li></ol>.mkString
 
-  val expectedOutput = <p>test</p><ul class="list list-bullet"><li>test</li><li>test</li></ul><p>test</p><ol class="list list-number"><li>test</li><li>test</li></ol>.mkString
+  val expectedOutput =
+    <p>test</p><ul class="list list-bullet"><li>test</li><li>test</li></ul><p>test</p><ol class="list list-number"><li>test</li><li>test</li></ol>.mkString
 
   val topic: String = "some-topic"
 

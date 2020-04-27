@@ -21,7 +21,7 @@ import play.api.Logger
 
 import scala.io.Source
 import scala.language.implicitConversions
-import scala.util.{Failure, Success, Try}
+import scala.util.{ Failure, Success, Try }
 import scala.xml._
 import scala.xml.parsing.XhtmlParser
 import scala.xml.transform.RewriteRule
@@ -49,31 +49,32 @@ trait ReplyDetails {
     }
   }
 
-  private def updateLists(nodes: Seq[Node]): Seq[Node] = {
+  private def updateLists(nodes: Seq[Node]): Seq[Node] =
     nodes.flatMap(node => addListClass(node))
-  }
 
-  protected def getContent(content: String): String = {
+  protected def getContent(content: String): String =
     stringToXhtml(content) match {
       case Success(nodes) => updateLists(nodes).mkString
       case Failure(e) =>
         Logger.error(s"Failed to parse content due to: ${e.getMessage}")
         ""
     }
-  }
 
-  def validate(content: String): Boolean = {
+  def validate(content: String): Boolean =
     stringToXhtml(content) match {
       case Success(_) => true
       case Failure(_) => false
     }
-  }
 }
 
-case class ReplyDetailsOptionalTopic(private val content: String, topic: Option[String], enquiryType: String, messageCount: Int) extends ReplyDetails {
+case class ReplyDetailsOptionalTopic(
+  private val content: String,
+  topic: Option[String],
+  enquiryType: String,
+  messageCount: Int)
+    extends ReplyDetails {
   def getContent: String = getContent(content)
 }
-
 
 object ReplyDetailsOptionalTopic {
   implicit val format: OFormat[ReplyDetailsOptionalTopic] = Json.format[ReplyDetailsOptionalTopic]

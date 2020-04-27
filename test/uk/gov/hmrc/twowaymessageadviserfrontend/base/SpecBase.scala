@@ -21,9 +21,9 @@ import akka.stream.Materializer
 import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice._
-import play.api.i18n.{Messages, MessagesApi}
+import play.api.i18n.{ Messages, MessagesApi }
 import play.api.inject.Injector
-import play.api.mvc.{AnyContentAsEmpty, Request, Results}
+import play.api.mvc.{ AnyContentAsEmpty, Request, Results }
 import play.api.test.FakeRequest
 import uk.gov.hmrc.twowaymessageadviserfrontend.config.FrontendAppConfig
 import uk.gov.hmrc.twowaymessageadviserfrontend.forms.ReplyFormProvider

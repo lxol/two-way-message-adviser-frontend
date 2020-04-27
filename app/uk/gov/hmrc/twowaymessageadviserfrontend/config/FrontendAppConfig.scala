@@ -16,19 +16,21 @@
 
 package uk.gov.hmrc.twowaymessageadviserfrontend.config
 
-import com.google.inject.{Inject, Singleton}
-import play.api.{Configuration, Environment, Mode}
+import com.google.inject.{ Inject, Singleton }
+import play.api.{ Configuration, Environment, Mode }
 import play.api.i18n.Lang
 import play.api.mvc.Call
 import uk.gov.hmrc.play.config.ServicesConfig
 import uk.gov.hmrc.twowaymessageadviserfrontend.controllers.routes
 
 @Singleton
-class FrontendAppConfig @Inject() (override val runModeConfiguration: Configuration, environment: Environment) extends ServicesConfig {
+class FrontendAppConfig @Inject()(override val runModeConfiguration: Configuration, environment: Environment)
+    extends ServicesConfig {
 
   override protected def mode: Mode.Mode = environment.mode
 
-  private def loadConfig(key: String) = runModeConfiguration.getString(key).getOrElse(throw new Exception(s"Missing configuration key: $key"))
+  private def loadConfig(key: String) =
+    runModeConfiguration.getString(key).getOrElse(throw new Exception(s"Missing configuration key: $key"))
 
   private lazy val contactHost = runModeConfiguration.getString("contact-frontend.host").getOrElse("")
   private val contactFormServiceIdentifier = "twowaymessagefrontend"
@@ -44,9 +46,8 @@ class FrontendAppConfig @Inject() (override val runModeConfiguration: Configurat
   lazy val loginUrl: String = loadConfig("urls.login")
   lazy val loginContinueUrl: String = loadConfig("urls.loginContinue")
 
-  lazy val languageTranslationEnabled: Boolean = runModeConfiguration.getBoolean("microservice.services.features.welsh-translation").getOrElse(true)
-  def languageMap: Map[String, Lang] = Map(
-    "english" -> Lang("en"),
-    "cymraeg" -> Lang("cy"))
+  lazy val languageTranslationEnabled: Boolean =
+    runModeConfiguration.getBoolean("microservice.services.features.welsh-translation").getOrElse(true)
+  def languageMap: Map[String, Lang] = Map("english" -> Lang("en"), "cymraeg" -> Lang("cy"))
   def routeToSwitchLanguage: String => Call = (lang: String) => routes.LanguageSwitchController.switchToLanguage(lang)
 }

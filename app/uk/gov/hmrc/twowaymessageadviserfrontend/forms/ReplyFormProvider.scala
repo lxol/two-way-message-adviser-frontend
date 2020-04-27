@@ -34,24 +34,23 @@ class ReplyFormProvider @Inject() extends Mappings {
         "enquiry-type"  -> nonEmptyText,
         "message-count" -> number
       )(ReplyDetailsOptionalTopic.apply)(ReplyDetailsOptionalTopic.unapply)
-        .verifying("Invalid content entered. Please try again removing any unusual characters or symbols.",
+        .verifying(
+          "Invalid content entered. Please try again removing any unusual characters or symbols.",
           reply => reply.validate(reply.getContent))
-        .verifying("Select a topic for your reply",
-          reply => checkForJrsMessage(reply))
+        .verifying("Select a topic for your reply", reply => checkForJrsMessage(reply))
     )
 
-  private def checkForJrsMessage(replyDetailsOptionalTopic: ReplyDetailsOptionalTopic): Boolean = {
-    if(replyDetailsOptionalTopic.messageCount <= 1) {
+  private def checkForJrsMessage(replyDetailsOptionalTopic: ReplyDetailsOptionalTopic): Boolean =
+    if (replyDetailsOptionalTopic.messageCount <= 1) {
       (replyDetailsOptionalTopic.enquiryType, replyDetailsOptionalTopic.topic) match {
         case ("epaye-jrs", Some(_)) => false
-        case (_,           Some(_)) => true
+        case (_, Some(_))           => true
         case ("epaye-jrs", None)    => true
-        case (_,           None)    => false
+        case (_, None)              => false
 
       }
 
     } else {
       replyDetailsOptionalTopic.topic.isEmpty
     }
-  }
 }

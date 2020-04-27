@@ -33,7 +33,8 @@ class StrideUtilSpec extends SpecBase {
     "host is included in redirect" in {
       val a = await(strideUtl.redirectToStrideLogin())
       a.header.status mustBe 303
-      a.header.headers.get("Location") mustBe Some("/stride/sign-in?successURL=http%3A%2F%2F%2F&origin=two-way-message-adviser-frontend")
+      a.header.headers.get("Location") mustBe Some(
+        "/stride/sign-in?successURL=http%3A%2F%2F%2F&origin=two-way-message-adviser-frontend")
     }
   }
 }
@@ -51,7 +52,8 @@ class IncludeHostRedirectStrideUtilSpec extends SpecBase {
     "do not include host in redirect" in {
       val response = await(strideUtl.redirectToStrideLogin())
       response.header.status mustBe 303
-      response.header.headers.get("Location") mustBe Some("/stride/sign-in?successURL=%2F&origin=two-way-message-adviser-frontend")
+      response.header.headers.get("Location") mustBe Some(
+        "/stride/sign-in?successURL=%2F&origin=two-way-message-adviser-frontend")
     }
   }
 }

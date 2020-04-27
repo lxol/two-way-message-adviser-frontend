@@ -21,7 +21,7 @@ import net.codingwell.scalaguice.ScalaModule
 import play.api.Configuration
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
-import uk.gov.hmrc.auth.core.{AuthConnector, AuthProviders, UnsupportedAuthProvider}
+import uk.gov.hmrc.auth.core.{ AuthConnector, AuthProviders, UnsupportedAuthProvider }
 import uk.gov.hmrc.auth.core.AuthProvider.PrivilegedApplication
 import uk.gov.hmrc.twowaymessageadviserfrontend.base.SpecBase
 import uk.gov.hmrc.twowaymessageadviserfrontend.connectors.mocks.MockAuthConnector
@@ -33,9 +33,8 @@ class IndexControllerSpec extends SpecBase with MockAuthConnector {
   override val injector = new GuiceApplicationBuilder()
     .configure(Configuration("metrics.enabled" -> false))
     .overrides(new AbstractModule with ScalaModule {
-      override def configure(): Unit = {
+      override def configure(): Unit =
         bind[AuthConnector].toInstance(mockAuthConnector)
-      }
     })
     .injector()
 
@@ -46,7 +45,8 @@ class IndexControllerSpec extends SpecBase with MockAuthConnector {
       mockAuthorise(AuthProviders(PrivilegedApplication))(Future.failed(UnsupportedAuthProvider()))
       val result = await(call(indexController.onPageLoad(), fakeRequest))
       result.header.status mustBe 303
-      result.header.headers.get("Location") mustBe Some("/stride/sign-in?successURL=http%3A%2F%2F%2F&origin=two-way-message-adviser-frontend")
+      result.header.headers.get("Location") mustBe Some(
+        "/stride/sign-in?successURL=http%3A%2F%2F%2F&origin=two-way-message-adviser-frontend")
     }
 
     "Given request when stride auth is present then request is successful" in {

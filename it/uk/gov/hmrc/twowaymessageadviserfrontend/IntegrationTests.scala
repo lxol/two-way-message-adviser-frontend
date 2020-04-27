@@ -15,14 +15,13 @@
  */
 package uk.gov.hmrc.twowaymessageadviserfrontend
 
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.{ Matchers, WordSpec }
 import play.api.libs.ws.WSClient
 import uk.gov.hmrc.integration.ServiceSpec
 
-class IntegrationTests extends WordSpec with Matchers with ServiceSpec  {
+class IntegrationTests extends WordSpec with Matchers with ServiceSpec {
 
   def externalServices: Seq[String] = Seq("datastream")
-
 
   "Two way message adviser frontend" should {
 
@@ -45,10 +44,11 @@ class IntegrationTests extends WordSpec with Matchers with ServiceSpec  {
     "Access to index when authed" in {
       val wsClient = app.injector.instanceOf[WSClient]
 
-      val response = wsClient.url(resource("/two-way-message-adviser-frontend"))
-          .withHeaders(AuthUtil.buildStrideToken())
-          .get
-          .futureValue
+      val response = wsClient
+        .url(resource("/two-way-message-adviser-frontend"))
+        .withHeaders(AuthUtil.buildStrideToken())
+        .get
+        .futureValue
 
       response.body contains "<title>Stride IdP Login</title>"
 
@@ -57,7 +57,8 @@ class IntegrationTests extends WordSpec with Matchers with ServiceSpec  {
     "Access to index reply when authed but get 400 due to incorrect message id" in {
       val wsClient = app.injector.instanceOf[WSClient]
 
-      val response = wsClient.url(resource("/two-way-message-adviser-frontend/message/1234/reply"))
+      val response = wsClient
+        .url(resource("/two-way-message-adviser-frontend/message/1234/reply"))
         .withHeaders(AuthUtil.buildStrideToken())
         .get
         .futureValue
@@ -70,7 +71,7 @@ class IntegrationTests extends WordSpec with Matchers with ServiceSpec  {
   object AuthUtil {
     val httpClient = app.injector.instanceOf[WSClient]
     lazy val authPort = 8500
-    lazy val ggAuthPort =  externalServicePorts.get("auth-login-api").get
+    lazy val ggAuthPort = externalServicePorts.get("auth-login-api").get
 
     private val STRIDE_USER_PAYLOAD =
       """
@@ -81,11 +82,12 @@ class IntegrationTests extends WordSpec with Matchers with ServiceSpec  {
         | }
       """.stripMargin
 
-
     def buildStrideToken(): (String, String) = {
-      val response = httpClient.url(s"http://localhost:$authPort/auth/sessions")
+      val response = httpClient
+        .url(s"http://localhost:$authPort/auth/sessions")
         .withHeaders(("Content-Type", "application/json"))
-        .post(STRIDE_USER_PAYLOAD).futureValue
+        .post(STRIDE_USER_PAYLOAD)
+        .futureValue
 
       ("Authorization", response.header("Authorization").get)
     }

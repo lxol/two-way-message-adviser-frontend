@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.twowaymessageadviserfrontend.models
 
-import play.api.libs.json.{Format, Json}
+import play.api.libs.json.{ Format, Json }
 
 object MessageMetadataFormat {
 
@@ -39,32 +39,30 @@ object MessageMetadataFormat {
 }
 case class TaxIdWithName(name: String, value: String)
 
-case class TaxEntity(regime: String,
-                     identifier: TaxIdWithName,
-                     email: Option[String] = None)
+case class TaxEntity(regime: String, identifier: TaxIdWithName, email: Option[String] = None)
 
 case class Adviser(pidId: String)
 
-case class MetadataDetails(threadId: Option[String],
-                           enquiryType: String,
-                           adviser: Option[Adviser])
+case class MetadataDetails(threadId: Option[String], enquiryType: String, adviser: Option[Adviser])
 
-case class TaxpayerName(title: Option[String] = None,
-                        forename: Option[String] = None,
-                        secondForename: Option[String] = None,
-                        surname: Option[String] = None,
-                        honours: Option[String] = None,
-                        line1: Option[String] = None,
-                        line2: Option[String] = None,
-                        line3: Option[String] = None) {
+case class TaxpayerName(
+  title: Option[String] = None,
+  forename: Option[String] = None,
+  secondForename: Option[String] = None,
+  surname: Option[String] = None,
+  honours: Option[String] = None,
+  line1: Option[String] = None,
+  line2: Option[String] = None,
+  line3: Option[String] = None) {
 
   override def toString: String =
     s"""${title.getOrElse("")} ${forename.getOrElse("")} ${surname.getOrElse("")}"""
 }
 
-case class MessageMetadata(id: String,
-                           recipient: TaxEntity,
-                           subject: String,
-                           details: MetadataDetails,
-                           taxpayerName: Option[TaxpayerName] = None,
-                           messageDate: String)
+case class MessageMetadata(
+  id: String,
+  recipient: TaxEntity,
+  subject: String,
+  details: MetadataDetails,
+  taxpayerName: Option[TaxpayerName] = None,
+  messageDate: String)

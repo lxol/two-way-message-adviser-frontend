@@ -17,7 +17,7 @@
 package uk.gov.hmrc.twowaymessageadviserfrontend.services
 
 import com.codahale.metrics.SharedMetricRegistries
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.{ Matchers, WordSpec }
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.twirl.api.Html
 import uk.gov.hmrc.auth.core.retrieve.Name

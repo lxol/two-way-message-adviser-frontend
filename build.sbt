@@ -1,3 +1,4 @@
+import com.lucidchart.sbt.scalafmt.ScalafmtCorePlugin.autoImport._
 import play.sbt.routes.RoutesKeys
 import scoverage.ScoverageKeys
 import uk.gov.hmrc.{DefaultBuildSettings, ExternalService}
@@ -30,6 +31,16 @@ lazy val root = (project in file("."))
     libraryDependencies              ++= AppDependencies.compile ++ AppDependencies.test,
 
     retrieveManaged := true,
+    inConfig(IntegrationTest)(
+      scalafmtCoreSettings ++
+        Seq(
+          compileInputs in compile := Def.taskDyn {
+            val task = test in (resolvedScoped.value.scope in scalafmt.key)
+            val previousInputs = (compileInputs in compile).value
+            task.map(_ => previousInputs)
+          }.value
+        )
+    ),
     evictionWarningOptions in update :=
       EvictionWarningOptions.default.withWarnScalaVersionEviction(false),
     fork in Test := true,
